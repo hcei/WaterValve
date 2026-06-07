@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DeviceDao {
-    @Query("SELECT * FROM device ORDER BY displayOrder ASC")
+    @Query("SELECT * FROM device ORDER BY isFavorite DESC, displayOrder ASC")
     fun observeAll(): Flow<List<Device>>
 
     @Query("SELECT * FROM device WHERE isFavorite = 1 ORDER BY displayOrder ASC")
