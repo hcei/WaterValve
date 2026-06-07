@@ -3,8 +3,10 @@ package com.hgu.watervalve.data.remote.api
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
+import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 /**
  * UWC / UIS API 接口定义。
@@ -34,10 +36,10 @@ interface UwcApiService {
      *
      * ⚠️ UIS Sign 算法待 Phase 3 确定（128 hex = 512-bit，疑似 HMAC-SHA512）。
      */
-    @FormUrlEncoded
-    @POST("uias/authentication/index/cas/login")
+    @GET("uias/authentication/index/cas/login")
     suspend fun casLogin(
-        @Field("ticket") ticket: String,
+        @Query("ticket") ticket: String,
+        @Query("service") service: String,
         @Header("Authorization") auth: String,
         @Header("Sign") sign: String,
         @Header("nonce") nonce: String,

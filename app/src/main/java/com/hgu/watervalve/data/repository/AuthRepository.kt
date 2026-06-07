@@ -43,13 +43,15 @@ class AuthRepository @Inject constructor(
     suspend fun authenticate(ticket: String): AuthResult = withContext(Dispatchers.IO) {
         try {
             // ── 第 1 步：CAS ticket → UIS SESSION ──
-            val signData = "ticket=$ticket"
-            val sign = UwcCrypto.signUis(signData)
+            val service = Constants.SPA_URL // CAS 回调地址
             val nonce = UwcCrypto.generateNonce()
             val timestamp = UwcCrypto.generateTimestamp().toString()
+            val signData = "service=$service&ticket=$ticket"
+            val sign = UwcCrypto.signUis(signData)
 
             val casResponse = api.casLogin(
                 ticket = ticket,
+                service = service,
                 auth = Constants.UIS_AUTHORIZATION,
                 sign = sign,
                 nonce = nonce,

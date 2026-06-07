@@ -2,6 +2,8 @@ package com.hgu.watervalve.ui.login
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -132,6 +134,7 @@ fun LoginScreen(
  * - 设置 Chrome Android UA（避免微信 OAuth 死循环）
  * - 拦截 URL 中的 `?ticket=ST-` 参数
  * - 安全加固：禁用文件/内容访问
+ * - 使用 `post` 延迟加载确保 WebView 已完成首次布局，避免 CAS 页面 JS 读到 0x0 尺寸
  */
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
@@ -139,29 +142,50 @@ private fun CasWebView(
     modifier: Modifier,
     onTicketIntercepted: (String) -> Unit,
 ) {
-    var webView by remember { mutableStateOf<WebView?>(null) }
-
     AndroidView(
         factory = { context ->
             WebView(context).apply {
+                setBackgroundColor(Color.WHITE)
+                // 显式设置 LayoutParams 确保 WebView 填充父容器
+                layoutParams = android.view.ViewGroup.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                )
+
                 @SuppressLint("SetJavaScriptEnabled")
-                settings.javaScriptEnabled = true
-                settings.domStorageEnabled = true
-                settings.userAgentString = Constants.USER_AGENT
-                settings.allowFileAccess = false
-                settings.allowContentAccess = false
-                settings.mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                with(settings) {
+                    javaScriptEnabled = true
+                    domStorageEnabled = true
+                    userAgentString = Constants.USER_AGENT
+                    allowFileAccess = false
+                    allowContentAccess = false
+                    mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                    loadWithOverviewMode = true
+                    useWideViewPort = true
+                    builtInZoomControls = false
+                    displayZoomControls = false
+                    layoutAlgorithm = android.webkit.WebSettings.LayoutAlgorithm.NORMAL
+                }
 
                 webViewClient = CasWebViewClient(onTicketIntercepted)
-            }.also { webView = it }
+                webChromeClient = WebChromeClient()
+
+                // 等待 WebView 完成首次 layout（宽高 > 0）后再加载，避免页面读到 0x0 尺寸
+                addOnLayoutChangeListener(object : android.view.View.OnLayoutChangeListener {
+                    override fun onLayoutChange(
+                        v: android.view.View?, l: Int, t: Int, r: Int, b: Int,
+                        ol: Int, ot: Int, or: Int, ob: Int,
+                    ) {
+                        if (width > 0 && height > 0) {
+                            removeOnLayoutChangeListener(this)
+                            loadUrl(Constants.CAS_LOGIN_URL)
+                        }
+                    }
+                })
+            }
         },
         modifier = modifier,
     )
-
-    // WebView 创建后加载 CAS URL
-    LaunchedEffect(webView) {
-        webView?.loadUrl(Constants.CAS_LOGIN_URL)
-    }
 }
 
 /**
