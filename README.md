@@ -114,10 +114,6 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
    UIS JWT 有效 ~2年
 ```
 
-## 下载
-
-[📦 **v1.0.0 APK 下载**](https://github.com/hcei/WaterValve/releases/download/v1.0.0/app-debug.apk)
-
 ## License
 
 MIT
