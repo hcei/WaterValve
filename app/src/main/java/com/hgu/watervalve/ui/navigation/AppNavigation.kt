@@ -52,7 +52,13 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 contentKey = key,
                 metadata = emptyMap(),
             ) { route ->
-                HomeScreen()
+                HomeScreen(
+                    onLogout = {
+                        // 返回登录页
+                        navBackStack.clear()
+                        navBackStack.add(LoginRoute)
+                    },
+                )
             }
             else -> error("未注册的路由: ${key::class.simpleName}")
         } as NavEntry<NavKey>

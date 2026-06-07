@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hgu.watervalve.data.repository.AuthRepository
 import com.hgu.watervalve.data.repository.AuthResult
+import com.hgu.watervalve.data.repository.AuthStage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,10 +36,15 @@ class LoginViewModel @Inject constructor(
     fun onTicketReceived(ticket: String) {
         if (_uiState.value is LoginUiState.Authenticating) return
 
-        _uiState.value = LoginUiState.Authenticating
+        _uiState.value = LoginUiState.Authenticating(AuthStage.CAS_LOGIN)
 
         viewModelScope.launch {
-            when (val result = authRepository.authenticate(ticket)) {
+            when (val result = authRepository.authenticate(
+                ticket = ticket,
+                onProgress = { stage ->
+                    _uiState.value = LoginUiState.Authenticating(stage)
+                },
+            )) {
                 is AuthResult.Success -> {
                     _uiState.value = LoginUiState.Success(
                         accNum = result.accNum,
@@ -67,7 +73,7 @@ sealed class LoginUiState {
     data object Idle : LoginUiState()
 
     /** 认证中：ticket 已拦截，正在调用 API */
-    data object Authenticating : LoginUiState()
+    data class Authenticating(val stage: AuthStage) : LoginUiState()
 
     /** 认证成功：已获取 UWC Token */
     data class Success(

@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.hgu.watervalve.data.repository.AuthStage
 import com.hgu.watervalve.util.Constants
 
 /**
@@ -95,7 +96,7 @@ fun LoginScreen(
 
             // 认证中遮罩
             if (uiState is LoginUiState.Authenticating) {
-                AuthenticatingOverlay()
+                AuthenticatingOverlay(stage = (uiState as LoginUiState.Authenticating).stage)
             }
         }
     }
@@ -238,10 +239,19 @@ private class CasWebViewClient(
 }
 
 /**
- * 认证中的加载遮罩。
+ * 认证中的加载遮罩，根据当前阶段显示动态文案和进度。
+ *
+ * @param stage 当前认证阶段
  */
 @Composable
-private fun AuthenticatingOverlay() {
+private fun AuthenticatingOverlay(stage: AuthStage) {
+    val (stepText, stepNum, totalSteps) = when (stage) {
+        AuthStage.CAS_LOGIN -> Triple("CAS 认证中", 1, 3)
+        AuthStage.GET_UIS_TOKEN -> Triple("获取 UIS Token", 2, 3)
+        AuthStage.LOGIN_BY_TOKEN -> Triple("换取 UWC Token", 3, 3)
+        AuthStage.UNKNOWN -> Triple("验证身份中", 1, 3)
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -264,12 +274,13 @@ private fun AuthenticatingOverlay() {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "第 1/3 步：CAS 认证中",
+                text = "第 $stepNum/$totalSteps 步：$stepText",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(modifier = Modifier.height(16.dp))
             LinearProgressIndicator(
+                progress = { stepNum.toFloat() / totalSteps.toFloat() },
                 modifier = Modifier
                     .fillMaxWidth(0.6f)
                     .height(4.dp),

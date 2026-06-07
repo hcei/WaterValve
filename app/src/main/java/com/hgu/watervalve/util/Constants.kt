@@ -5,7 +5,10 @@ object Constants {
     const val BASE_URL = "https://ykt.hgu.edu.cn/"
     const val CAS_LOGIN_URL = "https://cas.hgu.edu.cn/cas/login" +
         "?service=https://ykt.hgu.edu.cn/uwc_web_app/"
-    const val SPA_URL = "https://ykt.hgu.edu.cn/uwc_web_app/"
+    // CAS 回调地址（用于 service 参数）
+    const val CAS_SERVICE_URL = "https://ykt.hgu.edu.cn/uwc_web_app/"
+    // ★ SPA 前端地址（uwc_webapp 无下划线，Vue.js 应用入口）
+    const val SPA_URL = "https://ykt.hgu.edu.cn/uwc_webapp/"
 
     // --- Chrome Android UA (绝对不能使用微信UA) ---
     const val USER_AGENT = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36" +

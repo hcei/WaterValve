@@ -38,12 +38,17 @@ class AuthRepository @Inject constructor(
      * 执行完整认证链。
      *
      * @param ticket CAS 回调返回的 ST-xxxxx 格式 ticket
+     * @param onProgress 可选：每步开始时的进度回调，参数为当前阶段
      * @return [AuthResult.Success] 含 UWC Token 和用户数据，或 [AuthResult.Error]
      */
-    suspend fun authenticate(ticket: String): AuthResult = withContext(Dispatchers.IO) {
+    suspend fun authenticate(
+        ticket: String,
+        onProgress: ((AuthStage) -> Unit)? = null,
+    ): AuthResult = withContext(Dispatchers.IO) {
         try {
             // ── 第 1 步：CAS ticket → UIS SESSION ──
-            val service = Constants.SPA_URL // CAS 回调地址
+            onProgress?.invoke(AuthStage.CAS_LOGIN)
+            val service = Constants.CAS_SERVICE_URL // CAS 回调地址
             val nonce = UwcCrypto.generateNonce()
             val timestamp = UwcCrypto.generateTimestamp().toString()
             val signData = "service=$service&ticket=$ticket"
@@ -70,6 +75,7 @@ class AuthRepository @Inject constructor(
             kotlinx.coroutines.delay(100)
 
             // ── 第 2 步：SESSION → UIS JWT ──
+            onProgress?.invoke(AuthStage.GET_UIS_TOKEN)
             val uisResponse = api.getUisToken()
 
             if (!uisResponse.isSuccessful) {
@@ -96,6 +102,7 @@ class AuthRepository @Inject constructor(
             sessionManager.saveUisToken(uisJwt)
 
             // ── 第 3 步：UIS JWT → UWC Token ──
+            onProgress?.invoke(AuthStage.LOGIN_BY_TOKEN)
             val paramStr = UwcCrypto.buildParamStr(
                 mapOf("uiastoken" to uisJwt)
             )
@@ -137,11 +144,14 @@ class AuthRepository @Inject constructor(
 
             sessionManager.saveUwcToken(uwcToken)
 
-            // 提取用户信息
-            val accNum = data["accNum"] as? String ?: ""
-            val epId = data["epId"] as? String ?: ""
-            val userId = data["userId"] as? String ?: ""
-            val perCode = data["perCode"] as? String ?: ""
+            // 提取用户信息（Gson 将数字解析为 Double，需转 Int 再转 String）
+            val accNum = (data["accNum"] as? Number)?.toLong()?.toString() ?: data["accNum"]?.toString() ?: ""
+            val epId = (data["epId"] as? Number)?.toInt()?.toString() ?: data["epId"]?.toString() ?: "1"
+            val userId = (data["userId"] as? Number)?.toLong()?.toString() ?: data["userId"]?.toString() ?: ""
+            val perCode = (data["perCode"] as? Number)?.toLong()?.toString() ?: data["perCode"]?.toString() ?: ""
+
+            // 持久化用户信息
+            sessionManager.saveUserInfo(accNum, epId, userId, perCode)
 
             AuthResult.Success(
                 uisToken = uisJwt,

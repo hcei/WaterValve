@@ -25,11 +25,19 @@ class SessionManager @Inject constructor(
         val UWC_TOKEN = stringPreferencesKey("uwc_token")
         val SESSION_COOKIE = stringPreferencesKey("session_cookie")
         val CAS_TICKET = stringPreferencesKey("cas_ticket")
+        val USER_ACC_NUM = stringPreferencesKey("user_acc_num")
+        val USER_EP_ID = stringPreferencesKey("user_ep_id")
+        val USER_ID = stringPreferencesKey("user_id")
+        val USER_PER_CODE = stringPreferencesKey("user_per_code")
     }
 
     val uisToken: Flow<String?> = dataStore.data.map { it[UIS_TOKEN] }
     val uwcToken: Flow<String?> = dataStore.data.map { it[UWC_TOKEN] }
     val sessionCookie: Flow<String?> = dataStore.data.map { it[SESSION_COOKIE] }
+    val userAccNum: Flow<String?> = dataStore.data.map { it[USER_ACC_NUM] }
+    val userEpId: Flow<String?> = dataStore.data.map { it[USER_EP_ID] }
+    val userId: Flow<String?> = dataStore.data.map { it[USER_ID] }
+    val userPerCode: Flow<String?> = dataStore.data.map { it[USER_PER_CODE] }
 
     suspend fun saveUisToken(token: String) {
         dataStore.edit { it[UIS_TOKEN] = token }
@@ -45,6 +53,15 @@ class SessionManager @Inject constructor(
 
     suspend fun saveCasTicket(ticket: String) {
         dataStore.edit { it[CAS_TICKET] = ticket }
+    }
+
+    suspend fun saveUserInfo(accNum: String, epId: String, userId: String, perCode: String) {
+        dataStore.edit {
+            it[USER_ACC_NUM] = accNum
+            it[USER_EP_ID] = epId
+            it[USER_ID] = userId
+            it[USER_PER_CODE] = perCode
+        }
     }
 
     suspend fun clearAll() {
