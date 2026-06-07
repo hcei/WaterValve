@@ -32,6 +32,9 @@ interface DeviceDao {
     @Query("SELECT MAX(displayOrder) FROM device")
     suspend fun getMaxDisplayOrder(): Int?
 
+    @Query("SELECT * FROM device ORDER BY displayOrder ASC")
+    suspend fun getAllSync(): List<Device>
+
     @Query("DELETE FROM device")
     suspend fun deleteAll()
 }

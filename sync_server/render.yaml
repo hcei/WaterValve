@@ -1,0 +1,14 @@
+# Render 部署配置
+# 使用: 在 Render 控制台选择 "Blueprint" 或手动创建 Web Service
+
+services:
+  - type: web
+    name: watervalve-sync
+    runtime: python
+    region: singapore  # 新加坡（亚洲延迟低）
+    plan: free
+    buildCommand: ""    # 无需构建（纯 Python 标准库）
+    startCommand: python main.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.0"

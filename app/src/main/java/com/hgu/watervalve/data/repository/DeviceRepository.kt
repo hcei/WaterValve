@@ -44,26 +44,35 @@ class DeviceRepository @Inject constructor(
      *
      * 以 QR 码内容的 MD5 作为设备 id，避免重复。
      * 若已存在同内容设备则不重复添加。
+     * **扫描前会校验 QR 内容是否为合法的饮水机设备码**，
+     * 非饮水机设备码返回 [DeviceSaveResult.InvalidQr]。
      *
      * @param result QR 码扫描结果
-     * @return 保存后的 Device
+     * @return [DeviceSaveResult.Success] 含 Device，[DeviceSaveResult.AlreadyExists] 已存在，
+     *         [DeviceSaveResult.InvalidQr] 非饮水机设备码
      */
-    suspend fun saveFromQrScan(result: QrScanResult): Device = withContext(Dispatchers.IO) {
+    suspend fun saveFromQrScan(result: QrScanResult): DeviceSaveResult = withContext(Dispatchers.IO) {
+        // ── 校验 QR 内容是否为饮水机设备码 ──
+        if (!isValidDeviceQr(result.content)) {
+            return@withContext DeviceSaveResult.InvalidQr(result.content)
+        }
+
         val deviceId = md5(result.content)
         val existing = deviceDao.getById(deviceId)
         if (existing != null) {
-            existing // 已存在，不重复添加
+            DeviceSaveResult.AlreadyExists(existing)
         } else {
-            // 尝试从 QR 内容中提取可读的设备名称
             val displayName = extractDeviceName(result.content)
+            val currentUserId = sessionManager.userId.first() ?: ""
             val device = Device(
                 id = deviceId,
                 qrContent = result.content,
                 name = displayName,
                 displayOrder = (deviceDao.getMaxDisplayOrder() ?: 0) + 1,
+                userId = currentUserId,
             )
             deviceDao.upsert(device)
-            device
+            DeviceSaveResult.Success(device)
         }
     }
 
@@ -153,9 +162,39 @@ class DeviceRepository @Inject constructor(
         return qrContent.take(20) + if (qrContent.length > 20) "..." else ""
     }
 
+    /**
+     * 校验 QR 内容是否为合法的饮水机设备码。
+     *
+     * 合法格式：
+     * - URL 包含 `ykt.hgu.edu.cn/uwc_webapp`（学校饮水机 SPA 地址）
+     * - 以 `DEV-` 开头的设备 ID
+     */
+    private fun isValidDeviceQr(qrContent: String): Boolean {
+        if (qrContent.isBlank()) return false
+        // 学校饮水机 SPA URL
+        if (qrContent.contains("ykt.hgu.edu.cn/uwc_webapp", ignoreCase = true)) return true
+        // 设备 ID 格式
+        if (qrContent.startsWith("DEV-", ignoreCase = true)) return true
+        return false
+    }
+
     private fun md5(input: String): String {
         val digest = MessageDigest.getInstance("MD5")
         val hash = digest.digest(input.toByteArray(Charsets.UTF_8))
         return hash.joinToString("") { "%02x".format(it) }
     }
+}
+
+/**
+ * QR 扫码保存设备的结果。
+ */
+sealed class DeviceSaveResult {
+    /** 保存成功 */
+    data class Success(val device: Device) : DeviceSaveResult()
+
+    /** 设备已存在（同 QR 码已扫描过） */
+    data class AlreadyExists(val device: Device) : DeviceSaveResult()
+
+    /** 非饮水机设备码，拒绝保存 */
+    data class InvalidQr(val qrContent: String) : DeviceSaveResult()
 }

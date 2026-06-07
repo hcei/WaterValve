@@ -46,6 +46,7 @@ class MainActivity : ComponentActivity() {
                         hasToken = hasToken,
                         deepLinkDeviceId = launchDeviceId,
                         deepLinkQrContent = launchQrContent,
+                        sessionManager = sessionManager,
                     )
                 }
             }
@@ -76,6 +77,7 @@ class MainActivity : ComponentActivity() {
                         hasToken = hasToken,
                         deepLinkDeviceId = launchDeviceId,
                         deepLinkQrContent = launchQrContent,
+                        sessionManager = sessionManager,
                     )
                 }
             }

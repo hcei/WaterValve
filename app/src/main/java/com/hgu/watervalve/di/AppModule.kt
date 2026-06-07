@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.hgu.watervalve.data.local.db.AppDatabase
 import com.hgu.watervalve.data.local.db.DeviceDao
 import com.hgu.watervalve.data.local.db.WaterRecordDao
+import com.hgu.watervalve.data.remote.api.DeviceSyncApiService
 import com.hgu.watervalve.data.remote.api.UwcApiService
 import com.hgu.watervalve.data.remote.cookie.SessionCookieJar
 import com.hgu.watervalve.util.Constants
@@ -26,6 +27,7 @@ object AppModule {
 
     @Provides
     @Singleton
+    @UwcClient
     fun provideOkHttpClient(cookieJar: SessionCookieJar): OkHttpClient {
         return OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
@@ -40,7 +42,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    @UwcClient
+    fun provideRetrofit(@UwcClient okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Constants.BASE_URL)
             .client(okHttpClient)
@@ -50,7 +53,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideUwcApiService(retrofit: Retrofit): UwcApiService {
+    fun provideUwcApiService(@UwcClient retrofit: Retrofit): UwcApiService {
         return retrofit.create(UwcApiService::class.java)
     }
 
@@ -73,4 +76,37 @@ object AppModule {
     @Provides
     @Singleton
     fun provideWaterRecordDao(db: AppDatabase): WaterRecordDao = db.waterRecordDao()
+
+    // ── 设备同步云服务 ──
+
+    @Provides
+    @Singleton
+    @SyncClient
+    fun provideSyncOkHttpClient(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(10, TimeUnit.SECONDS)
+            .addInterceptor(HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BASIC
+            })
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @SyncClient
+    fun provideSyncRetrofit(@SyncClient syncOkHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(Constants.SYNC_SERVER_URL)
+            .client(syncOkHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideDeviceSyncApiService(@SyncClient syncRetrofit: Retrofit): DeviceSyncApiService {
+        return syncRetrofit.create(DeviceSyncApiService::class.java)
+    }
 }

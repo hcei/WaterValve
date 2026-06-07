@@ -51,6 +51,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -68,6 +69,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.hgu.watervalve.R
 import com.hgu.watervalve.data.camera.QrScanResult
+import com.hgu.watervalve.data.repository.DeviceSaveResult
 import com.hgu.watervalve.domain.model.Device
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -80,6 +82,7 @@ import java.util.Locale
  * @param onDeviceClick 点击设备卡片回调，传入设备 id 和 qrContent
  * @param onRecordsClick 点击记录按钮回调
  * @param onLogout 退出登录回调
+ * @param showHelpInitially 首次使用自动弹出帮助页（仅在首次为 true）
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -88,11 +91,21 @@ fun HomeScreen(
     onRecordsClick: (() -> Unit)? = null,
     onLogout: (() -> Unit)? = null,
     viewModel: HomeViewModel = hiltViewModel(),
+    showHelpInitially: Boolean = false,
 ) {
     val devices by viewModel.devices.collectAsState()
     var showQrScan by remember { mutableStateOf(false) }
-    var showHelp by remember { mutableStateOf(false) }
+    var showHelp by remember { mutableStateOf(showHelpInitially) }
+    var qrErrorMessage by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
+
+    // 首次使用自动弹出帮助页，弹出后立即标记已读
+    LaunchedEffect(showHelpInitially) {
+        if (showHelpInitially) {
+            showHelp = true
+            viewModel.markOnboardingSeen()
+        }
+    }
 
     // ── 重命名对话框状态 ──
     var renameTarget by remember { mutableStateOf<Device?>(null) }
@@ -202,7 +215,15 @@ fun HomeScreen(
         QrScanScreen(
             onScanned = { result ->
                 scope.launch {
-                    viewModel.saveQrResult(result)
+                    when (val saveResult = viewModel.saveQrResult(result)) {
+                        is DeviceSaveResult.Success -> {
+                            viewModel.pushToCloud()
+                        }
+                        is DeviceSaveResult.AlreadyExists -> { /* 已存在，静默处理 */ }
+                        is DeviceSaveResult.InvalidQr -> {
+                            qrErrorMessage = "扫描的二维码不是饮水机设备码，请扫描饮水机上的二维码"
+                        }
+                    }
                 }
                 showQrScan = false
             },
@@ -227,6 +248,20 @@ fun HomeScreen(
     // ── 帮助与反馈 ──
     if (showHelp) {
         HelpSheet(onDismiss = { showHelp = false })
+    }
+
+    // ── QR 扫码校验失败提示 ──
+    if (qrErrorMessage != null) {
+        AlertDialog(
+            onDismissRequest = { qrErrorMessage = null },
+            title = { Text("无法添加设备") },
+            text = { Text(qrErrorMessage ?: "") },
+            confirmButton = {
+                TextButton(onClick = { qrErrorMessage = null }) {
+                    Text("知道了")
+                }
+            },
+        )
     }
 }
 

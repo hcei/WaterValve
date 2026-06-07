@@ -2,14 +2,19 @@ package com.hgu.watervalve.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.scene.SinglePaneSceneStrategy
 import androidx.navigation3.ui.NavDisplay
+import com.hgu.watervalve.data.local.datastore.SessionManager
 import com.hgu.watervalve.ui.home.HomeScreen
 import com.hgu.watervalve.ui.login.LoginScreen
 import com.hgu.watervalve.ui.record.RecordScreen
@@ -56,6 +61,7 @@ fun AppNavigation(
     hasToken: Boolean = false,
     deepLinkDeviceId: String? = null,
     deepLinkQrContent: String = "",
+    sessionManager: SessionManager? = null,
 ) {
     // 根据 Token 状态选择初始路由
     val initialRoute = when {
@@ -65,6 +71,10 @@ fun AppNavigation(
     }
 
     val navBackStack = rememberNavBackStack(initialRoute)
+
+    // 检查是否首次使用（用于自动弹出帮助页）
+    val hasSeenOnboarding by (sessionManager?.hasSeenOnboarding?.collectAsState(initial = false) ?: remember { mutableStateOf(false) })
+    val showHelpInitially = !hasSeenOnboarding
 
     // 如果从 deep-link 进入但未登录，保存目标直到登录完成
     val pendingDeepLink = rememberSaveable { mutableStateOf(
@@ -112,6 +122,7 @@ fun AppNavigation(
                         navBackStack.clear()
                         navBackStack.add(LoginRoute)
                     },
+                    showHelpInitially = showHelpInitially,
                 )
             }
             is ValveRoute -> NavEntry(

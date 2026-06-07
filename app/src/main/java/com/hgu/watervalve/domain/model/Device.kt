@@ -28,4 +28,5 @@ data class Device(
     val displayOrder: Int = 0,
     val isFavorite: Boolean = false,
     val lastUsedAt: Long = 0L,
+    @ColumnInfo(name = "user_id") val userId: String = "",
 )

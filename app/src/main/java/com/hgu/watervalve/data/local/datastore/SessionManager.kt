@@ -3,6 +3,7 @@ package com.hgu.watervalve.data.local.datastore
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -29,6 +30,7 @@ class SessionManager @Inject constructor(
         val USER_EP_ID = stringPreferencesKey("user_ep_id")
         val USER_ID = stringPreferencesKey("user_id")
         val USER_PER_CODE = stringPreferencesKey("user_per_code")
+        val HAS_SEEN_ONBOARDING = booleanPreferencesKey("has_seen_onboarding")
     }
 
     val uisToken: Flow<String?> = dataStore.data.map { it[UIS_TOKEN] }
@@ -38,6 +40,7 @@ class SessionManager @Inject constructor(
     val userEpId: Flow<String?> = dataStore.data.map { it[USER_EP_ID] }
     val userId: Flow<String?> = dataStore.data.map { it[USER_ID] }
     val userPerCode: Flow<String?> = dataStore.data.map { it[USER_PER_CODE] }
+    val hasSeenOnboarding: Flow<Boolean> = dataStore.data.map { it[HAS_SEEN_ONBOARDING] ?: false }
 
     suspend fun saveUisToken(token: String) {
         dataStore.edit { it[UIS_TOKEN] = token }
@@ -66,5 +69,10 @@ class SessionManager @Inject constructor(
 
     suspend fun clearAll() {
         dataStore.edit { it.clear() }
+    }
+
+    /** 标记用户已看过首次引导 */
+    suspend fun markOnboardingSeen() {
+        dataStore.edit { it[HAS_SEEN_ONBOARDING] = true }
     }
 }
