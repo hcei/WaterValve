@@ -36,8 +36,6 @@ object Constants {
     const val H5CALL_SCHEME = "com.hzsun.h5call://"
 
     // --- 设备同步服务器 ---
-    // 本地开发: http://127.0.0.1:8000/ (需启动 sync_server/main.py + adb reverse)
-    // Render 云部署: https://watervalve-sync.onrender.com/
-    // 部署后替换为实际 Render URL
-    const val SYNC_SERVER_URL = "http://127.0.0.1:8000/"
+    // PythonAnywhere: https://hcei.pythonanywhere.com/
+    const val SYNC_SERVER_URL = "https://hcei.pythonanywhere.com/"
 }
