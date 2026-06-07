@@ -1,0 +1,33 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+*.iml
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Android
+local.properties
+/captures
+.externalNativeBuild/
+.cxx/
+
+# Build outputs (keep wrapper)
+/app/build/
+/app/release/
+
+# Temp numbered scripts (keep build_phase1.bat)
+build[2-9].bat
+
+# Screenshots
+*.png
+
+# Environment
+.env
