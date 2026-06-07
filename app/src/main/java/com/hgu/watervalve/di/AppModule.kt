@@ -61,7 +61,9 @@ object AppModule {
             context,
             AppDatabase::class.java,
             "watervalve.db"
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides

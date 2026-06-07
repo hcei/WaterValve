@@ -28,9 +28,9 @@ object Constants {
     // ⚠️ Phase 3: 真实密钥待真机抓包验证，当前为占位值
     const val UIS_SIGN_KEY = "hzsun.com.uwc的sign验签加密key"
 
-    // --- SPA 路由 ---
-    const val H5_OPEN_VALVE = "https://ykt.hgu.edu.cn/uwc_web_app/#/openValve"
-    const val H5_DEVICE_LIST = "https://ykt.hgu.edu.cn/uwc_web_app/#/deviceList"
+    // --- SPA 路由（uwc_webapp 无下划线，是 SPA 前端） ---
+    const val H5_OPEN_VALVE = "https://ykt.hgu.edu.cn/uwc_webapp/#/openValve"
+    const val H5_DEVICE_LIST = "https://ykt.hgu.edu.cn/uwc_webapp/#/deviceList"
 
     // --- H5CALL 协议前缀 ---
     const val H5CALL_SCHEME = "com.hzsun.h5call://"

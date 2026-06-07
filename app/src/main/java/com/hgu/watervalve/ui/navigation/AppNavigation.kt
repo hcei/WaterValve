@@ -9,6 +9,7 @@ import androidx.navigation3.scene.SinglePaneSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import com.hgu.watervalve.ui.home.HomeScreen
 import com.hgu.watervalve.ui.login.LoginScreen
+import com.hgu.watervalve.ui.valve.ValveScreen
 import kotlinx.serialization.Serializable
 
 /**
@@ -20,12 +21,16 @@ object LoginRoute : NavKey, java.io.Serializable
 @Serializable
 object HomeRoute : NavKey, java.io.Serializable
 
+@Serializable
+data class ValveRoute(val deviceId: String, val qrContent: String = "") : NavKey, java.io.Serializable
+
 /**
  * App 导航图。
  *
  * 路由：
  * ```
  * LoginRoute ──(认证成功)──▶ HomeRoute
+ * HomeRoute  ──(点击设备)──▶ ValveRoute(deviceId)
  * ```
  */
 @Composable
@@ -43,6 +48,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             ) { route ->
                 LoginScreen(
                     onLoginSuccess = {
+                        navBackStack.clear()
                         navBackStack.add(HomeRoute)
                     },
                 )
@@ -53,10 +59,26 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 metadata = emptyMap(),
             ) { route ->
                 HomeScreen(
+                    onDeviceClick = { deviceId, qrContent ->
+                        navBackStack.add(ValveRoute(deviceId, qrContent))
+                    },
                     onLogout = {
-                        // 返回登录页
                         navBackStack.clear()
                         navBackStack.add(LoginRoute)
+                    },
+                )
+            }
+            is ValveRoute -> NavEntry(
+                key = key,
+                contentKey = key,
+                metadata = emptyMap(),
+            ) { route ->
+                val valveRoute = route as ValveRoute
+                ValveScreen(
+                    deviceId = valveRoute.deviceId,
+                    qrContent = valveRoute.qrContent,
+                    onBack = {
+                        navBackStack.removeLastOrNull()
                     },
                 )
             }

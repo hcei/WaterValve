@@ -7,7 +7,7 @@ import com.hgu.watervalve.domain.model.WaterRecord
 
 @Database(
     entities = [Device::class, WaterRecord::class],
-    version = 1,
+    version = 3,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {

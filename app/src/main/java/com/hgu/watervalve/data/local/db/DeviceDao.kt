@@ -14,6 +14,9 @@ interface DeviceDao {
     @Query("SELECT * FROM device ORDER BY displayOrder ASC")
     fun observeAll(): Flow<List<Device>>
 
+    @Query("SELECT * FROM device WHERE isFavorite = 1 ORDER BY displayOrder ASC")
+    fun observeFavorites(): Flow<List<Device>>
+
     @Query("SELECT * FROM device WHERE id = :id")
     suspend fun getById(id: String): Device?
 
@@ -25,6 +28,9 @@ interface DeviceDao {
 
     @Delete
     suspend fun delete(device: Device)
+
+    @Query("SELECT MAX(displayOrder) FROM device")
+    suspend fun getMaxDisplayOrder(): Int?
 
     @Query("DELETE FROM device")
     suspend fun deleteAll()
