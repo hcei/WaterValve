@@ -73,7 +73,7 @@ fun AppNavigation(
     val navBackStack = rememberNavBackStack(initialRoute)
 
     // 检查是否首次使用（用于自动弹出帮助页）
-    val hasSeenOnboarding by (sessionManager?.hasSeenOnboarding?.collectAsState(initial = false) ?: remember { mutableStateOf(false) })
+    val hasSeenOnboarding by (sessionManager?.hasSeenOnboarding?.collectAsState(initial = true) ?: remember { mutableStateOf(true) })
     val showHelpInitially = !hasSeenOnboarding
 
     // 如果从 deep-link 进入但未登录，保存目标直到登录完成
