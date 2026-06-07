@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">一键开阀</string>
+    <string name="app_name">小河滴答</string>
+    <string name="widget_description">河滴答@一键开阀器桌面小部件，展示收藏设备，点击直达开阀控制</string>
 </resources>

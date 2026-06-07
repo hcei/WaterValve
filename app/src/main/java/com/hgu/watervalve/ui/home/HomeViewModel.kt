@@ -80,6 +80,14 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    /** 重命名设备 */
+    fun renameDevice(deviceId: String, newName: String) {
+        if (newName.isBlank()) return
+        viewModelScope.launch {
+            deviceRepository.updateCustomName(deviceId, newName)
+        }
+    }
+
     /** 退出登录 */
     fun logout() {
         viewModelScope.launch {

@@ -5,7 +5,9 @@ import android.webkit.WebView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hgu.watervalve.data.local.datastore.SessionManager
+import com.hgu.watervalve.data.local.db.WaterRecordDao
 import com.hgu.watervalve.data.repository.DeviceRepository
+import com.hgu.watervalve.domain.model.WaterRecord
 import com.hgu.watervalve.ui.webview.H5CallResult
 import com.hgu.watervalve.ui.webview.UwcJsBridge
 import com.hgu.watervalve.util.Constants
@@ -29,6 +31,7 @@ import javax.inject.Inject
 class ValveViewModel @Inject constructor(
     private val deviceRepository: DeviceRepository,
     private val sessionManager: SessionManager,
+    private val waterRecordDao: WaterRecordDao,
 ) : ViewModel() {
 
     companion object {
@@ -101,6 +104,18 @@ class ValveViewModel @Inject constructor(
         Log.d(TAG, "设备: id=$id, qrContent=$qrContent")
         viewModelScope.launch {
             deviceRepository.updateLastUsed(id)
+            // 记录开阀操作
+            val device = deviceRepository.getById(id)
+            val deviceName = device?.customName?.ifBlank { device?.name } ?: "饮水机设备"
+            waterRecordDao.insert(
+                WaterRecord(
+                    deviceId = id,
+                    deviceName = deviceName,
+                    action = "access",
+                    result = "success",
+                    message = "打开设备控制页",
+                )
+            )
         }
     }
 

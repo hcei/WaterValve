@@ -86,8 +86,14 @@ dependencies {
     implementation(libs.gson)
 
     // Glance (P1 Widget)
+    implementation(libs.glance)
     implementation(libs.glance.appwidget)
     implementation(libs.glance.material3)
+
+    // WorkManager (Token 自动刷新)
+    implementation(libs.work.runtime.ktx)
+    implementation(libs.hilt.work)
+    ksp(libs.hilt.work.compiler)
 
     // CameraX + ML Kit (QR 码扫描)
     implementation(libs.camerax.core)

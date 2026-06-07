@@ -8,6 +8,7 @@ import com.hgu.watervalve.data.remote.cookie.SessionCookieJar
 import com.hgu.watervalve.data.remote.crypto.UwcCrypto
 import com.hgu.watervalve.util.Constants
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -167,6 +168,66 @@ class AuthRepository @Inject constructor(
                 message = e.message ?: "认证过程发生未知错误",
                 cause = e,
             )
+        }
+    }
+
+    /**
+     * 仅刷新 UWC Token（使用已有的 UIS JWT）。
+     *
+     * 对应认证链的第 3 步：UIS JWT → UWC Token。
+     * 适用于 Widget 唤醒、WorkManager 周期刷新等场景。
+     *
+     * @return 成功时返回新的 UWC Token，失败返回 null
+     */
+    suspend fun refreshUwcToken(): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val uisJwtNullable = sessionManager.uisToken.first()
+            if (uisJwtNullable.isNullOrBlank()) {
+                return@withContext Result.failure(
+                    IllegalStateException("UIS Token 不存在，需要重新登录")
+                )
+            }
+            val uisJwt = uisJwtNullable // smart-cast to non-null
+
+            val paramStr = UwcCrypto.buildParamStr(
+                mapOf("uiastoken" to uisJwt)
+            )
+
+            val uwcResponse = api.loginByToken(
+                token = uisJwt,
+                timestamp = UwcCrypto.generateTimestamp().toString(),
+                nonce = UwcCrypto.generateNonce(),
+                paramStr = paramStr,
+            )
+
+            if (!uwcResponse.isSuccessful) {
+                return@withContext Result.failure(
+                    IllegalStateException("刷新 UWC Token 失败 (HTTP ${uwcResponse.code()})")
+                )
+            }
+
+            val body = uwcResponse.body()
+            val resultMap = body?.get("resultMap") as? String
+            if (resultMap.isNullOrBlank()) {
+                return@withContext Result.failure(
+                    IllegalStateException("响应中未找到 resultMap")
+                )
+            }
+
+            val decrypted = UwcCrypto.decryptResponse(resultMap)
+            val data = UwcCrypto.parseDataField(decrypted)
+
+            val uwcToken = data["token"] as? String ?: ""
+            if (uwcToken.isBlank()) {
+                return@withContext Result.failure(
+                    IllegalStateException("解密后未找到 UWC Token")
+                )
+            }
+
+            sessionManager.saveUwcToken(uwcToken)
+            Result.success(uwcToken)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 
