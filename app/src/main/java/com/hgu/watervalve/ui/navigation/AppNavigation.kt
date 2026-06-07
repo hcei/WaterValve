@@ -15,10 +15,10 @@ import kotlinx.serialization.Serializable
  * Navigation3 路由定义。
  */
 @Serializable
-object LoginRoute : NavKey
+object LoginRoute : NavKey, java.io.Serializable
 
 @Serializable
-object HomeRoute : NavKey
+object HomeRoute : NavKey, java.io.Serializable
 
 /**
  * App 导航图。
