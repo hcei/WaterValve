@@ -88,11 +88,6 @@ gradlew assembleDebug --no-daemon
 # app/build/outputs/apk/debug/app-debug.apk
 ```
 
-### 安装到设备
-
-```bash
-adb install -r app/build/outputs/apk/debug/app-debug.apk
-```
 
 ## 认证流程
 
