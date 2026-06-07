@@ -1,2 +1,1 @@
-# 纯 Python 标准库，无需额外依赖
-# Render 仍需要此文件来识别项目为 Python 项目
+flask>=3.0.0

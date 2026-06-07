@@ -1,10 +1,10 @@
 """
-河滴答@一键开阀器 — 设备列表云端同步服务 (Render 云部署版)
+河滴答@一键开阀器 — 设备列表云端同步服务 (PythonAnywhere 版)
 
-纯 Python 标准库实现，按 userId 存取设备列表。
-数据持久化到 JSON 文件。
+Flask WSGI 应用，适配 PythonAnywhere 免费托管。
+按 userId 存取设备列表，JSON 文件持久化。
 
-部署平台: Render.com (免费 Web Service)
+部署平台: PythonAnywhere.com (免费，无需信用卡)
 
 API:
     GET  /              → 健康检查
@@ -15,18 +15,17 @@ API:
 
 import json
 import os
-from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlparse, unquote
+
+from flask import Flask, jsonify, request
 
 # ── 配置 ──────────────────────────────────────────────
-# Render 自动注入 PORT 环境变量
-PORT = int(os.environ.get("PORT", "8000"))
-HOST = "0.0.0.0"
 
 DATA_DIR = Path(__file__).parent / "data"
 DATA_FILE = DATA_DIR / "devices.json"
+
+app = Flask(__name__)
 
 
 # ── 数据层 ────────────────────────────────────────────
@@ -52,99 +51,64 @@ def _save_all(data: dict[str, list[dict[str, Any]]]) -> None:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
-# ── HTTP 处理器 ───────────────────────────────────────
+# ── CORS 支持 ─────────────────────────────────────────
 
-class DeviceSyncHandler(BaseHTTPRequestHandler):
-
-    def _send_json(self, data: Any, status: int = 200) -> None:
-        body = json.dumps(data, ensure_ascii=False).encode("utf-8")
-        self.send_response(status)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Content-Length", str(len(body)))
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
-        self.end_headers()
-        self.wfile.write(body)
-
-    def _read_body(self) -> bytes:
-        length = int(self.headers.get("Content-Length", "0"))
-        return self.rfile.read(length)
-
-    def _parse_path(self) -> tuple[str, str | None]:
-        parsed = urlparse(self.path)
-        path = unquote(parsed.path).rstrip("/")
-        if path == "" or path == "/":
-            return ("health", None)
-        if path == "/api/health":
-            return ("health", None)
-        if path.startswith("/api/devices/"):
-            user_id = path[len("/api/devices/"):]
-            return ("devices", user_id if user_id else None)
-        return ("unknown", None)
-
-    def do_OPTIONS(self) -> None:
-        self.send_response(204)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
-        self.end_headers()
-
-    def do_GET(self) -> None:
-        route, user_id = self._parse_path()
-
-        if route == "health":
-            self._send_json({"status": "ok", "service": "device-sync"})
-            return
-
-        if route == "devices" and user_id:
-            all_data = _load_all()
-            self._send_json(all_data.get(user_id, []))
-            return
-
-        self._send_json({"error": "Not Found"}, status=404)
-
-    def do_POST(self) -> None:
-        route, user_id = self._parse_path()
-
-        if route == "devices" and user_id:
-            try:
-                body = self._read_body()
-                payload = json.loads(body.decode("utf-8"))
-                if isinstance(payload, list):
-                    devices = payload
-                elif isinstance(payload, dict) and "devices" in payload:
-                    devices = payload["devices"]
-                else:
-                    self._send_json({"error": "请求体格式错误，期望设备数组"}, status=400)
-                    return
-
-                all_data = _load_all()
-                all_data[user_id] = devices
-                _save_all(all_data)
-                self._send_json({"status": "ok", "count": len(devices)})
-                return
-            except json.JSONDecodeError:
-                self._send_json({"error": "JSON 解析失败"}, status=400)
-                return
-
-        self._send_json({"error": "Not Found"}, status=404)
-
-    def log_message(self, format: str, *args: Any) -> None:
-        print(f"[{self.log_date_time_string()}] {args[0]}")
+@app.after_request
+def add_cors(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    return response
 
 
-# ── 启动入口 ──────────────────────────────────────────
+# ── API ───────────────────────────────────────────────
 
-def main() -> None:
-    print(f"河滴答 设备同步服务启动 → 端口 {PORT}")
-    server = HTTPServer((HOST, PORT), DeviceSyncHandler)
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>", methods=["OPTIONS"])
+def handle_options(path):
+    return "", 204
+
+
+@app.route("/")
+@app.route("/api/health")
+def health():
+    return jsonify({"status": "ok", "service": "device-sync"})
+
+
+@app.route("/api/devices/<user_id>", methods=["GET"])
+def get_devices(user_id: str):
+    if not user_id.strip():
+        return jsonify({"error": "userId 不能为空"}), 400
+    all_data = _load_all()
+    return jsonify(all_data.get(user_id, []))
+
+
+@app.route("/api/devices/<user_id>", methods=["POST"])
+def save_devices(user_id: str):
+    if not user_id.strip():
+        return jsonify({"error": "userId 不能为空"}), 400
+
     try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        print("\n服务已停止")
-        server.server_close()
+        payload = request.get_json(force=True)
+    except Exception:
+        return jsonify({"error": "JSON 解析失败"}), 400
 
+    if isinstance(payload, list):
+        devices = payload
+    elif isinstance(payload, dict) and "devices" in payload:
+        devices = payload["devices"]
+    else:
+        return jsonify({"error": "请求体格式错误，期望设备数组"}), 400
+
+    all_data = _load_all()
+    all_data[user_id] = devices
+    _save_all(all_data)
+    return jsonify({"status": "ok", "count": len(devices)})
+
+
+# ── 本地开发启动 ──────────────────────────────────────
 
 if __name__ == "__main__":
-    main()
+    port = int(os.environ.get("PORT", "8000"))
+    print(f"河滴答 设备同步服务启动 → 端口 {port}")
+    app.run(host="0.0.0.0", port=port, debug=False)
