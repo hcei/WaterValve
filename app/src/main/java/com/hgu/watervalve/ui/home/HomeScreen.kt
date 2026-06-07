@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Switch
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
@@ -67,10 +68,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.hgu.watervalve.BuildConfig
 import com.hgu.watervalve.R
 import com.hgu.watervalve.data.camera.QrScanResult
 import com.hgu.watervalve.data.repository.DeviceSaveResult
 import com.hgu.watervalve.domain.model.Device
+import com.hgu.watervalve.ui.update.UpdateDialog
+import com.hgu.watervalve.ui.update.UpdateViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -91,6 +95,7 @@ fun HomeScreen(
     onRecordsClick: (() -> Unit)? = null,
     onLogout: (() -> Unit)? = null,
     viewModel: HomeViewModel = hiltViewModel(),
+    updateViewModel: UpdateViewModel = hiltViewModel(),
     showHelpInitially: Boolean = false,
 ) {
     val devices by viewModel.devices.collectAsState()
@@ -105,6 +110,11 @@ fun HomeScreen(
             showHelp = true
             viewModel.markOnboardingSeen()
         }
+    }
+
+    // 进入主页时检查应用更新
+    LaunchedEffect(Unit) {
+        updateViewModel.checkForUpdate()
     }
 
     // ── 重命名对话框状态 ──
@@ -247,7 +257,10 @@ fun HomeScreen(
 
     // ── 帮助与反馈 ──
     if (showHelp) {
-        HelpSheet(onDismiss = { showHelp = false })
+        HelpSheet(
+            onDismiss = { showHelp = false },
+            updateViewModel = updateViewModel,
+        )
     }
 
     // ── QR 扫码校验失败提示 ──
@@ -263,6 +276,9 @@ fun HomeScreen(
             },
         )
     }
+
+    // ── 应用更新弹窗 ──
+    UpdateDialog(viewModel = updateViewModel)
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -430,8 +446,12 @@ private fun formatTime(timestamp: Long): String {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun HelpSheet(onDismiss: () -> Unit) {
+private fun HelpSheet(
+    onDismiss: () -> Unit,
+    updateViewModel: UpdateViewModel,
+) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val autoCheckUpdate by updateViewModel.autoCheckUpdate.collectAsState()
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -478,6 +498,60 @@ private fun HelpSheet(onDismiss: () -> Unit) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(vertical = 2.dp),
                 )
+            }
+
+            Spacer(Modifier.height(20.dp))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            Spacer(Modifier.height(20.dp))
+
+            // ── 应用更新 ──
+            Text(
+                "应用更新",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(Modifier.height(8.dp))
+
+            // 自动检测更新开关
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        "自动检测更新",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Text(
+                        "开启后每48小时自动检查新版本",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Switch(
+                    checked = autoCheckUpdate,
+                    onCheckedChange = { updateViewModel.toggleAutoCheckUpdate(it) },
+                )
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            // 当前版本 + 手动检查
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    "当前版本：v${BuildConfig.VERSION_NAME}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f),
+                )
+                TextButton(onClick = { updateViewModel.manualCheck() }) {
+                    Text("检查更新", style = MaterialTheme.typography.bodySmall)
+                }
             }
 
             Spacer(Modifier.height(20.dp))

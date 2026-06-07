@@ -11,3 +11,8 @@ annotation class UwcClient
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class SyncClient
+
+/** GitHub API 客户端（更新检查） */
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class GitHubClient

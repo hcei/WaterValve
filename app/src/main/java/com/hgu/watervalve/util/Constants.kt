@@ -38,4 +38,17 @@ object Constants {
     // --- 设备同步服务器 ---
     // PythonAnywhere: https://hcei.pythonanywhere.com/
     const val SYNC_SERVER_URL = "https://hcei.pythonanywhere.com/"
+
+    // --- 应用更新 ---
+    const val GITHUB_REPO_OWNER = "hcei"
+    const val GITHUB_REPO_NAME = "WaterValve"
+    const val GITHUB_API_URL = "https://api.github.com/"
+    // 国内镜像（Gitee，需手动同步仓库）
+    const val GITEE_RELEASE_BASE = "https://gitee.com/hcei/WaterValve/releases/download"
+    // PythonAnywhere 代理（元数据 + APK 下载）
+    const val PROXY_RELEASE_API = "${SYNC_SERVER_URL}api/release/latest"
+    const val PROXY_APK_DOWNLOAD = "${SYNC_SERVER_URL}api/release/apk"
+
+    // 更新检查冷却时间（1 小时）
+    const val UPDATE_CHECK_COOLDOWN_MS = 3_600_000L
 }

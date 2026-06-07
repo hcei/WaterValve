@@ -15,10 +15,13 @@ API:
 
 import json
 import os
+import time
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from flask import Flask, jsonify, request
+import requests
+from flask import Flask, Response, jsonify, request
 
 # ── 配置 ──────────────────────────────────────────────
 
@@ -104,6 +107,74 @@ def save_devices(user_id: str):
     all_data[user_id] = devices
     _save_all(all_data)
     return jsonify({"status": "ok", "count": len(devices)})
+
+
+# ── 应用更新代理 ──────────────────────────────────────
+
+_GITHUB_RELEASE_URL = (
+    "https://api.github.com/repos/hcei/WaterValve/releases/latest"
+)
+_CACHE_TTL_SECONDS = 300  # 5 分钟
+
+
+def _fetch_github_release():
+    """从 GitHub API 获取最新 release（带 5 分钟缓存）。"""
+    resp = requests.get(
+        _GITHUB_RELEASE_URL,
+        headers={"Accept": "application/vnd.github.v3+json"},
+        timeout=15,
+    )
+    resp.raise_for_status()
+    return resp.json()
+
+
+@lru_cache(maxsize=1)
+def _cached_release():
+    """缓存包装：返回 (data, timestamp) 元组。"""
+    return _fetch_github_release(), time.time()
+
+
+@app.route("/api/release/latest")
+def proxy_latest_release():
+    """GitHub Release 元数据代理（5 分钟缓存）。"""
+    try:
+        data, ts = _cached_release()
+        if time.time() - ts > _CACHE_TTL_SECONDS:
+            _cached_release.cache_clear()
+            data, ts = _cached_release()
+        return jsonify(data)
+    except requests.RequestException as e:
+        return jsonify({"error": f"GitHub API 不可用: {str(e)}"}), 502
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/release/apk")
+def proxy_apk_download():
+    """APK 下载代理（流式转发 GitHub Release asset）。"""
+    tag = request.args.get("tag", "")
+    if not tag:
+        return jsonify({"error": "缺少 tag 参数"}), 400
+
+    github_url = (
+        f"https://github.com/hcei/WaterValve/releases/download/"
+        f"{tag}/app-debug.apk"
+    )
+
+    try:
+        resp = requests.get(github_url, stream=True, timeout=120)
+        resp.raise_for_status()
+    except requests.RequestException as e:
+        return jsonify({"error": f"下载失败: {str(e)}"}), 502
+
+    return Response(
+        resp.iter_content(chunk_size=8192),
+        content_type="application/vnd.android.package-archive",
+        headers={
+            "Content-Disposition": f"attachment; filename=WaterValve-{tag}.apk",
+            "Content-Length": resp.headers.get("Content-Length", ""),
+        },
+    )
 
 
 # ── 本地开发启动 ──────────────────────────────────────

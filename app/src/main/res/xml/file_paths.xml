@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- APK 下载目录: getExternalFilesDir(DIRECTORY_DOWNLOADS) -->
+    <external-files-path name="updates" path="Download/" />
+    <!-- 回退: cache dir -->
+    <cache-path name="cache_updates" path="/" />
+</paths>

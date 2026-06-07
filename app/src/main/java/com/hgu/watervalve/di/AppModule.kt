@@ -6,6 +6,7 @@ import com.hgu.watervalve.data.local.db.AppDatabase
 import com.hgu.watervalve.data.local.db.DeviceDao
 import com.hgu.watervalve.data.local.db.WaterRecordDao
 import com.hgu.watervalve.data.remote.api.DeviceSyncApiService
+import com.hgu.watervalve.data.remote.api.UpdateApiService
 import com.hgu.watervalve.data.remote.api.UwcApiService
 import com.hgu.watervalve.data.remote.cookie.SessionCookieJar
 import com.hgu.watervalve.util.Constants
@@ -108,5 +109,38 @@ object AppModule {
     @Singleton
     fun provideDeviceSyncApiService(@SyncClient syncRetrofit: Retrofit): DeviceSyncApiService {
         return syncRetrofit.create(DeviceSyncApiService::class.java)
+    }
+
+    // ── GitHub API（应用更新检查）──
+
+    @Provides
+    @Singleton
+    @GitHubClient
+    fun provideGitHubOkHttpClient(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .connectTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(15, TimeUnit.SECONDS)
+            .writeTimeout(15, TimeUnit.SECONDS)
+            .addInterceptor(HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BASIC
+            })
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @GitHubClient
+    fun provideGitHubRetrofit(@GitHubClient gitHubOkHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://api.github.com/")
+            .client(gitHubOkHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideUpdateApiService(@GitHubClient gitHubRetrofit: Retrofit): UpdateApiService {
+        return gitHubRetrofit.create(UpdateApiService::class.java)
     }
 }
