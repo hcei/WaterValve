@@ -29,5 +29,9 @@ build[2-9].bat
 # Screenshots
 *.png
 
+# Debug
+*_log.txt
+build_now.bat
+
 # Environment
 .env
