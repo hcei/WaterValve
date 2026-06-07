@@ -142,6 +142,33 @@ object UwcCrypto {
     }
 
     // ═══════════════════════════════════════════════════════════
+    // UIS Sign（HMAC-SHA512）
+    // ═══════════════════════════════════════════════════════════
+
+    /**
+     * 生成 UIS API 的 Sign 请求头。
+     *
+     * 算法（推测，待真机验证）：
+     * 1. 将请求参数拼接为 `key1=val1&key2=val2&...`
+     * 2. 使用 HMAC-SHA512(key, data) 生成 512-bit 签名
+     * 3. 输出 128 位小写 hex 字符串
+     *
+     * @param data 待签名的参数字符串（不含 merchantKey）
+     * @param key  签名密钥（来自 [Constants.UIS_SIGN_KEY]）
+     * @return 128 字符小写 hex 签名
+     */
+    fun signUis(data: String, key: String = Constants.UIS_SIGN_KEY): String {
+        val mac = javax.crypto.Mac.getInstance("HmacSHA512")
+        val keySpec = javax.crypto.spec.SecretKeySpec(
+            key.toByteArray(Charsets.UTF_8),
+            "HmacSHA512"
+        )
+        mac.init(keySpec)
+        val hash = mac.doFinal(data.toByteArray(Charsets.UTF_8))
+        return hash.joinToString("") { "%02x".format(it) }
+    }
+
+    // ═══════════════════════════════════════════════════════════
     // 工具方法
     // ═══════════════════════════════════════════════════════════
 

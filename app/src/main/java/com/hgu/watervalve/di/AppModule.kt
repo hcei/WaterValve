@@ -6,6 +6,7 @@ import com.hgu.watervalve.data.local.db.AppDatabase
 import com.hgu.watervalve.data.local.db.DeviceDao
 import com.hgu.watervalve.data.local.db.WaterRecordDao
 import com.hgu.watervalve.data.remote.api.UwcApiService
+import com.hgu.watervalve.data.remote.cookie.SessionCookieJar
 import com.hgu.watervalve.util.Constants
 import dagger.Module
 import dagger.Provides
@@ -25,11 +26,12 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
+    fun provideOkHttpClient(cookieJar: SessionCookieJar): OkHttpClient {
         return OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
+            .cookieJar(cookieJar)
             .addInterceptor(HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BODY
             })
