@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Switch
@@ -66,6 +68,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.hgu.watervalve.BuildConfig
@@ -99,9 +102,12 @@ fun HomeScreen(
     showHelpInitially: Boolean = false,
 ) {
     val devices by viewModel.devices.collectAsState()
+    val isBanned by viewModel.isBanned.collectAsState()
     var showQrScan by remember { mutableStateOf(false) }
     var showHelp by remember { mutableStateOf(showHelpInitially) }
+    var showDevQr by remember { mutableStateOf(false) }
     var qrErrorMessage by remember { mutableStateOf<String?>(null) }
+    var showLogoutConfirm by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     // 首次使用自动弹出帮助页，弹出后立即标记已读
@@ -148,10 +154,7 @@ fun HomeScreen(
                         }
                     }
                     if (onLogout != null) {
-                        IconButton(onClick = {
-                            viewModel.logout()
-                            onLogout()
-                        }) {
+                        IconButton(onClick = { showLogoutConfirm = true }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                                 contentDescription = "退出登录",
@@ -255,6 +258,31 @@ fun HomeScreen(
         )
     }
 
+    // ── 退出登录确认 ──
+    if (showLogoutConfirm) {
+        AlertDialog(
+            onDismissRequest = { showLogoutConfirm = false },
+            title = { Text("退出登录") },
+            text = { Text("是否退出登录") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showLogoutConfirm = false
+                    scope.launch {
+                        viewModel.clearAllAppData()
+                        onLogout?.invoke()
+                    }
+                }) {
+                    Text("是")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLogoutConfirm = false }) {
+                    Text("否")
+                }
+            },
+        )
+    }
+
     // ── 帮助与反馈 ──
     if (showHelp) {
         HelpSheet(
@@ -279,6 +307,62 @@ fun HomeScreen(
 
     // ── 应用更新弹窗 ──
     UpdateDialog(viewModel = updateViewModel)
+
+    // ── 封禁提示 ──
+    if (isBanned) {
+        AlertDialog(
+            onDismissRequest = { /* 不允许关闭 */ },
+            title = { Text("账号已被封禁") },
+            text = {
+                Text(
+                    "您的账号因违规行为已被管理员封禁，设备同步功能暂时不可用。",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    scope.launch {
+                        viewModel.clearAllAppData()
+                        onLogout?.invoke()
+                    }
+                }) {
+                    Text("退出登录")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDevQr = true }) {
+                    Text("联系开发者")
+                }
+            },
+        )
+    }
+
+    // ── 开发者二维码弹窗 ──
+    if (showDevQr) {
+        AlertDialog(
+            onDismissRequest = { showDevQr = false },
+            icon = {
+                Icon(
+                    painter = painterResource(R.drawable.wechat_qr),
+                    contentDescription = "开发者微信二维码",
+                    modifier = Modifier.size(160.dp),
+                    tint = Color.Unspecified,
+                )
+            },
+            title = { Text("联系开发者") },
+            text = {
+                Text(
+                    "请扫描二维码添加开发者微信，或发送邮件至：1079648697@qq.com",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { showDevQr = false }) {
+                    Text("关闭")
+                }
+            },
+        )
+    }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -462,7 +546,8 @@ private fun HelpSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp)
-                .padding(bottom = 32.dp),
+                .padding(bottom = 32.dp)
+                .verticalScroll(rememberScrollState()),
         ) {
             // ── 标题 ──
             Text(

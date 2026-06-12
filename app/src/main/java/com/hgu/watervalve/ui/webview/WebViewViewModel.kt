@@ -114,16 +114,6 @@ class WebViewViewModel @Inject constructor(
         _uiState.value = WebViewUiState.Idle
     }
 
-    /** 退出登录：清除所有 Token/Cookie/用户信息 */
-    fun logout() {
-        viewModelScope.launch {
-            cookieJar.clearCookie()
-            sessionManager.clearAll()
-            _tokenInfo.value = null
-            _userInfo.value = emptyMap()
-            _uiState.value = WebViewUiState.Idle
-        }
-    }
 
 }
 

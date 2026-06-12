@@ -231,11 +231,7 @@ class AuthRepository @Inject constructor(
         }
     }
 
-    /** 清除所有认证状态（退出登录） */
-    suspend fun logout() {
-        cookieJar.clearCookie()
-        sessionManager.clearAll()
-    }
+
 }
 
 /** 认证结果 */

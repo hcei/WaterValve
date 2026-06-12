@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -111,6 +112,7 @@ fun AppNavigation(
                 contentKey = key,
                 metadata = emptyMap(),
             ) { route ->
+                val activity = androidx.compose.ui.platform.LocalContext.current as? android.app.Activity
                 HomeScreen(
                     onDeviceClick = { deviceId, qrContent ->
                         navBackStack.add(ValveRoute(deviceId, qrContent))
@@ -119,8 +121,10 @@ fun AppNavigation(
                         navBackStack.add(RecordRoute)
                     },
                     onLogout = {
+                        // clearAllAppData() 已在 HomeViewModel 中完成数据清除
                         navBackStack.clear()
-                        navBackStack.add(LoginRoute)
+                        // 结束所有 Activity，下次启动即为全新安装状态
+                        activity?.finishAffinity()
                     },
                     showHelpInitially = showHelpInitially,
                 )

@@ -1,20 +1,27 @@
 package com.hgu.watervalve.ui.home
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hgu.watervalve.data.camera.QrScanResult
 import com.hgu.watervalve.data.local.datastore.SessionManager
+import com.hgu.watervalve.data.local.db.WaterRecordDao
 import com.hgu.watervalve.data.remote.cookie.SessionCookieJar
 import com.hgu.watervalve.data.repository.DeviceRepository
 import com.hgu.watervalve.data.repository.DeviceSaveResult
 import com.hgu.watervalve.data.repository.DeviceSyncRepository
 import com.hgu.watervalve.domain.model.Device
+import com.hgu.watervalve.data.repository.DeviceSyncRepository.BannedException
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -26,6 +33,8 @@ class HomeViewModel @Inject constructor(
     private val sessionManager: SessionManager,
     private val cookieJar: SessionCookieJar,
     private val deviceSyncRepository: DeviceSyncRepository,
+    private val waterRecordDao: WaterRecordDao,
+    @ApplicationContext private val appContext: Context,
 ) : ViewModel() {
 
     /** 设备列表（来自 Room，Flow 自动更新） */
@@ -35,6 +44,10 @@ class HomeViewModel @Inject constructor(
             viewModelScope.launch { flow.collect { state.value = it } }
             state.asStateFlow()
         }
+
+    /** 用户是否已被封禁 */
+    private val _isBanned = MutableStateFlow(false)
+    val isBanned: StateFlow<Boolean> = _isBanned.asStateFlow()
 
     init {
         // 进入主页时从云端拉取设备
@@ -104,11 +117,42 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    /** 退出登录 */
-    fun logout() {
-        viewModelScope.launch {
-            cookieJar.clearCookie()
+    /**
+     * 清除 App 全部本地数据（相当于重新安装）。
+     *
+     * 清除范围：
+     * - Room 数据库（设备 + 用水记录）
+     * - DataStore（Token、用户信息、偏好设置）
+     * - OkHttp Cookie 缓存
+     * - WebView 数据（Cookie、Storage、Cache）
+     * - App 内部缓存目录
+     *
+     * 设备列表存储在服务端，重新登录后会自动从云端拉回。
+     */
+    suspend fun clearAllAppData() {
+        withContext(Dispatchers.IO) {
+            // 1. 清除 Room 数据库
+            deviceRepository.deleteAll()
+            waterRecordDao.deleteAll()
+
+            // 2. 清除 DataStore
             sessionManager.clearAll()
+
+            // 3. 清除 OkHttp Cookie 缓存
+            cookieJar.clearCookie()
+
+            // 4. 清除 WebView 数据
+            val cookieManager = android.webkit.CookieManager.getInstance()
+            cookieManager.removeAllCookies(null)
+            cookieManager.flush()
+            android.webkit.WebStorage.getInstance().deleteAllData()
+
+            // 5. 清除 App 内部缓存目录
+            try {
+                appContext.cacheDir.deleteRecursively()
+            } catch (_: Exception) {
+                // 缓存目录清理失败不影响核心功能
+            }
         }
     }
 
@@ -121,6 +165,12 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = sessionManager.userId.first() ?: return@launch
             deviceSyncRepository.pullFromCloud(userId)
+                .onFailure { e ->
+                    if (e is BannedException) {
+                        _isBanned.value = true
+                        sessionManager.setBanned(true)
+                    }
+                }
         }
     }
 
@@ -130,6 +180,12 @@ class HomeViewModel @Inject constructor(
             val userId = sessionManager.userId.first() ?: return@launch
             val currentDevices = devices.value
             deviceSyncRepository.pushToCloud(userId, currentDevices)
+                .onFailure { e ->
+                    if (e is BannedException) {
+                        _isBanned.value = true
+                        sessionManager.setBanned(true)
+                    }
+                }
         }
     }
 

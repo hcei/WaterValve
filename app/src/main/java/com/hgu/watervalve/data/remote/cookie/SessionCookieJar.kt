@@ -84,8 +84,5 @@ class SessionCookieJar @Inject constructor(
 
     fun clearCookie() {
         cachedCookieValue = null
-        scope.launch {
-            sessionManager.clearAll()
-        }
     }
 }
