@@ -1,0 +1,432 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4F03D8852CFA010100000001 /* WaterValveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000001 /* WaterValveApp.swift */; };
+		4F03D8852CFA010100000002 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000002 /* AppState.swift */; };
+		4F03D8852CFA010100000003 /* AppContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000003 /* AppContainer.swift */; };
+		4F03D8852CFA010100000004 /* AppNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000004 /* AppNavigation.swift */; };
+		4F03D8852CFA010100000005 /* BannedAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000005 /* BannedAlertView.swift */; };
+		4F03D8852CFA010100000006 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000006 /* LoginView.swift */; };
+		4F03D8852CFA010100000007 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000007 /* HomeView.swift */; };
+		4F03D8852CFA010100000008 /* QRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000008 /* QRScannerView.swift */; };
+		4F03D8852CFA010100000009 /* ValveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000009 /* ValveView.swift */; };
+		4F03D8852CFA01010000000A /* RecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA10010000000A /* RecordView.swift */; };
+		4F03D8852CFA01010000000B /* WebViewScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA10010000000B /* WebViewScreen.swift */; };
+		4F03D8852CFA01010000000C /* BackgroundTaskManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA10010000000C /* BackgroundTaskManager.swift */; };
+		4F03D8852CFA01010000000D /* UpdateInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA10010000000D /* UpdateInfo.swift */; };
+		4F03D8852CFA01010000000E /* UpdateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA10010000000E /* UpdateService.swift */; };
+		4F03D8852CFA01010000000F /* UpdateAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA10010000000F /* UpdateAlertView.swift */; };
+		4F03D8852CFA010100000010 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000010 /* Assets.xcassets */; };
+		4F03D8852CFA010100000011 /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000012 /* AppConstants.swift */; };
+		4F03D8852CFA010100000012 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000013 /* APIClient.swift */; };
+		4F03D8852CFA010100000013 /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000014 /* Crypto.swift */; };
+		4F03D8852CFA010100000014 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000015 /* KeychainStore.swift */; };
+		4F03D8852CFA010100000015 /* KeyValueStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000016 /* KeyValueStore.swift */; };
+		4F03D8852CFA010100000016 /* Repositories.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000017 /* Repositories.swift */; };
+		4F03D8852CFA010100000017 /* SessionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000018 /* SessionModels.swift */; };
+		4F03D8852CFA010100000018 /* SharedBridgeProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000019 /* SharedBridgeProbe.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		4F03D8852CFA000100000001 /* WaterValve.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WaterValve.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4F03D8852CFA100100000001 /* WaterValveApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterValveApp.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000002 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000003 /* AppContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContainer.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000004 /* AppNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavigation.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000005 /* BannedAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BannedAlertView.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000006 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000007 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000008 /* QRScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerView.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000009 /* ValveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValveView.swift; sourceTree = "<group>"; };
+		4F03D8852CFA10010000000A /* RecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordView.swift; sourceTree = "<group>"; };
+		4F03D8852CFA10010000000B /* WebViewScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewScreen.swift; sourceTree = "<group>"; };
+		4F03D8852CFA10010000000C /* BackgroundTaskManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundTaskManager.swift; sourceTree = "<group>"; };
+		4F03D8852CFA10010000000D /* UpdateInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateInfo.swift; sourceTree = "<group>"; };
+		4F03D8852CFA10010000000E /* UpdateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateService.swift; sourceTree = "<group>"; };
+		4F03D8852CFA10010000000F /* UpdateAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateAlertView.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000010 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Resources/Assets.xcassets; sourceTree = "<group>"; };
+		4F03D8852CFA100100000011 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Resources/Info.plist; sourceTree = "<group>"; };
+		4F03D8852CFA100100000012 /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000013 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000014 /* Crypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Crypto.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000015 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000016 /* KeyValueStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueStore.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000017 /* Repositories.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Repositories.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000018 /* SessionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionModels.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000019 /* SharedBridgeProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedBridgeProbe.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4F03D8852CFA000100000002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4F03D8852CFA00010000001B /* Build Shared Framework */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Build Shared Framework";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "bash \"$SRCROOT/BuildPhases/build-shared.sh\"";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXGroup section */
+		4F03D8852CFA000100000003 = {
+			isa = PBXGroup;
+			children = (
+				4F03D8852CFA000100000004 /* WaterValve */,
+				4F03D8852CFA000100000005 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4F03D8852CFA000100000004 /* WaterValve */ = {
+			isa = PBXGroup;
+			path = WaterValve;
+			sourceTree = "<group>";
+			children = (
+				4F03D8852CFA000100000006 /* Core */,
+				4F03D8852CFA000100000007 /* Navigation */,
+				4F03D8852CFA000100000008 /* UI */,
+				4F03D8852CFA000100000009 /* Background */,
+				4F03D8852CFA00010000000A /* Update */,
+				4F03D8852CFA100100000010 /* Assets.xcassets */,
+				4F03D8852CFA100100000011 /* Info.plist */,
+				4F03D8852CFA100100000001 /* WaterValveApp.swift */,
+			);
+		};
+		4F03D8852CFA000100000005 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4F03D8852CFA000100000001 /* WaterValve.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4F03D8852CFA000100000006 /* Core */ = {
+			isa = PBXGroup;
+			path = Core;
+			sourceTree = "<group>";
+			children = (
+				4F03D8852CFA100100000002 /* AppState.swift */,
+				4F03D8852CFA100100000003 /* AppContainer.swift */,
+				4F03D8852CFA100100000012 /* AppConstants.swift */,
+				4F03D8852CFA100100000013 /* APIClient.swift */,
+				4F03D8852CFA100100000014 /* Crypto.swift */,
+				4F03D8852CFA100100000015 /* KeychainStore.swift */,
+				4F03D8852CFA100100000016 /* KeyValueStore.swift */,
+				4F03D8852CFA100100000017 /* Repositories.swift */,
+				4F03D8852CFA100100000018 /* SessionModels.swift */,
+				4F03D8852CFA100100000019 /* SharedBridgeProbe.swift */,
+			);
+		};
+		4F03D8852CFA000100000007 /* Navigation */ = {
+			isa = PBXGroup;
+			path = Navigation;
+			sourceTree = "<group>";
+			children = (
+				4F03D8852CFA100100000004 /* AppNavigation.swift */,
+			);
+		};
+		4F03D8852CFA000100000008 /* UI */ = {
+			isa = PBXGroup;
+			path = UI;
+			sourceTree = "<group>";
+			children = (
+				4F03D8852CFA00010000000B /* Common */,
+				4F03D8852CFA00010000000C /* Login */,
+				4F03D8852CFA00010000000D /* Home */,
+				4F03D8852CFA00010000000E /* QRScanner */,
+				4F03D8852CFA00010000000F /* Valve */,
+				4F03D8852CFA000100000010 /* Record */,
+				4F03D8852CFA000100000011 /* WebView */,
+			);
+		};
+		4F03D8852CFA000100000009 /* Background */ = {
+			isa = PBXGroup;
+			path = Background;
+			sourceTree = "<group>";
+			children = (
+				4F03D8852CFA10010000000C /* BackgroundTaskManager.swift */,
+			);
+		};
+		4F03D8852CFA00010000000A /* Update */ = {
+			isa = PBXGroup;
+			path = Update;
+			sourceTree = "<group>";
+			children = (
+				4F03D8852CFA10010000000D /* UpdateInfo.swift */,
+				4F03D8852CFA10010000000E /* UpdateService.swift */,
+				4F03D8852CFA10010000000F /* UpdateAlertView.swift */,
+			);
+		};
+		4F03D8852CFA00010000000B /* Common */ = {
+			isa = PBXGroup;
+			path = Common;
+			sourceTree = "<group>";
+			children = (
+				4F03D8852CFA100100000005 /* BannedAlertView.swift */,
+			);
+		};
+		4F03D8852CFA00010000000C /* Login */ = {
+			isa = PBXGroup;
+			path = Login;
+			sourceTree = "<group>";
+			children = (
+				4F03D8852CFA100100000006 /* LoginView.swift */,
+			);
+		};
+		4F03D8852CFA00010000000D /* Home */ = {
+			isa = PBXGroup;
+			path = Home;
+			sourceTree = "<group>";
+			children = (
+				4F03D8852CFA100100000007 /* HomeView.swift */,
+			);
+		};
+		4F03D8852CFA00010000000E /* QRScanner */ = {
+			isa = PBXGroup;
+			path = QRScanner;
+			sourceTree = "<group>";
+			children = (
+				4F03D8852CFA100100000008 /* QRScannerView.swift */,
+			);
+		};
+		4F03D8852CFA00010000000F /* Valve */ = {
+			isa = PBXGroup;
+			path = Valve;
+			sourceTree = "<group>";
+			children = (
+				4F03D8852CFA100100000009 /* ValveView.swift */,
+			);
+		};
+		4F03D8852CFA000100000010 /* Record */ = {
+			isa = PBXGroup;
+			path = Record;
+			sourceTree = "<group>";
+			children = (
+				4F03D8852CFA10010000000A /* RecordView.swift */,
+			);
+		};
+		4F03D8852CFA000100000011 /* WebView */ = {
+			isa = PBXGroup;
+			path = WebView;
+			sourceTree = "<group>";
+			children = (
+				4F03D8852CFA10010000000B /* WebViewScreen.swift */,
+			);
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4F03D8852CFA000100000012 /* WaterValve */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4F03D8852CFA00010000001A /* Build configuration list for PBXNativeTarget "WaterValve" */;
+			buildPhases = (
+				4F03D8852CFA00010000001B /* Build Shared Framework */,
+				4F03D8852CFA000100000014 /* Sources */,
+				4F03D8852CFA000100000002 /* Frameworks */,
+				4F03D8852CFA000100000015 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WaterValve;
+			productName = WaterValve;
+			productReference = 4F03D8852CFA000100000001 /* WaterValve.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4F03D8852CFA000100000016 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					4F03D8852CFA000100000012 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = 4F03D8852CFA000100000019 /* Build configuration list for PBXProject "WaterValve" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 4F03D8852CFA000100000003;
+			productRefGroup = 4F03D8852CFA000100000005 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4F03D8852CFA000100000012 /* WaterValve */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4F03D8852CFA000100000015 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4F03D8852CFA010100000010 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4F03D8852CFA000100000014 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4F03D8852CFA010100000001 /* WaterValveApp.swift in Sources */,
+				4F03D8852CFA010100000002 /* AppState.swift in Sources */,
+				4F03D8852CFA010100000003 /* AppContainer.swift in Sources */,
+				4F03D8852CFA010100000004 /* AppNavigation.swift in Sources */,
+				4F03D8852CFA010100000005 /* BannedAlertView.swift in Sources */,
+				4F03D8852CFA010100000006 /* LoginView.swift in Sources */,
+				4F03D8852CFA010100000007 /* HomeView.swift in Sources */,
+				4F03D8852CFA010100000008 /* QRScannerView.swift in Sources */,
+				4F03D8852CFA010100000009 /* ValveView.swift in Sources */,
+				4F03D8852CFA01010000000A /* RecordView.swift in Sources */,
+				4F03D8852CFA01010000000B /* WebViewScreen.swift in Sources */,
+				4F03D8852CFA01010000000C /* BackgroundTaskManager.swift in Sources */,
+				4F03D8852CFA01010000000D /* UpdateInfo.swift in Sources */,
+				4F03D8852CFA01010000000E /* UpdateService.swift in Sources */,
+				4F03D8852CFA01010000000F /* UpdateAlertView.swift in Sources */,
+				4F03D8852CFA010100000011 /* AppConstants.swift in Sources */,
+				4F03D8852CFA010100000012 /* APIClient.swift in Sources */,
+				4F03D8852CFA010100000013 /* Crypto.swift in Sources */,
+				4F03D8852CFA010100000014 /* KeychainStore.swift in Sources */,
+				4F03D8852CFA010100000015 /* KeyValueStore.swift in Sources */,
+				4F03D8852CFA010100000016 /* Repositories.swift in Sources */,
+				4F03D8852CFA010100000017 /* SessionModels.swift in Sources */,
+				4F03D8852CFA010100000018 /* SharedBridgeProbe.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		4F03D8852CFA000100000017 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../shared/build/bin/iosArm64/debugFramework",
+					"$(SRCROOT)/../shared/build/bin/iosSimulatorArm64/debugFramework",
+				);
+				GENERATE_INFOPLIST_FILE = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					Shared,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.hgu.watervalve.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				INFOPLIST_FILE = WaterValve/Resources/Info.plist;
+			};
+			name = Debug;
+		};
+		4F03D8852CFA000100000018 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../shared/build/bin/iosArm64/releaseFramework",
+					"$(SRCROOT)/../shared/build/bin/iosSimulatorArm64/releaseFramework",
+				);
+				GENERATE_INFOPLIST_FILE = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					Shared,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.hgu.watervalve.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				INFOPLIST_FILE = WaterValve/Resources/Info.plist;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4F03D8852CFA000100000019 /* Build configuration list for PBXProject "WaterValve" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4F03D8852CFA000100000017 /* Debug */,
+				4F03D8852CFA000100000018 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4F03D8852CFA00010000001A /* Build configuration list for PBXNativeTarget "WaterValve" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4F03D8852CFA000100000017 /* Debug */,
+				4F03D8852CFA000100000018 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4F03D8852CFA000100000016 /* Project object */;
+}

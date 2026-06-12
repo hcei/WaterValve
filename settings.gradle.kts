@@ -19,3 +19,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "WaterValve"
 include(":app")
+include(":shared")

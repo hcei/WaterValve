@@ -1,0 +1,17 @@
+CREATE TABLE WaterRecord (
+    id         INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    deviceName TEXT    NOT NULL,
+    timestamp  INTEGER NOT NULL
+);
+
+selectAll:
+SELECT * FROM WaterRecord ORDER BY timestamp DESC;
+
+insert:
+INSERT INTO WaterRecord(deviceName, timestamp) VALUES (?, ?);
+
+deleteById:
+DELETE FROM WaterRecord WHERE id = ?;
+
+deleteAll:
+DELETE FROM WaterRecord;

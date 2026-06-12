@@ -1,0 +1,32 @@
+CREATE TABLE Device (
+    id        TEXT    NOT NULL PRIMARY KEY,
+    name      TEXT    NOT NULL,
+    qrUrl     TEXT    NOT NULL,
+    starred   INTEGER NOT NULL DEFAULT 0,
+    createdAt INTEGER NOT NULL
+);
+
+selectAll:
+SELECT * FROM Device ORDER BY starred DESC, createdAt DESC;
+
+selectById:
+SELECT * FROM Device WHERE id = ?;
+
+insertOrReplace:
+INSERT OR REPLACE INTO Device(id, name, qrUrl, starred, createdAt)
+VALUES (?, ?, ?, ?, ?);
+
+updateName:
+UPDATE Device SET name = ? WHERE id = ?;
+
+updateStarred:
+UPDATE Device SET starred = ? WHERE id = ?;
+
+deleteById:
+DELETE FROM Device WHERE id = ?;
+
+deleteAll:
+DELETE FROM Device;
+
+countAll:
+SELECT COUNT(*) FROM Device;
