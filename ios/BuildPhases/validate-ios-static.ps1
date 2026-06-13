@@ -259,7 +259,8 @@ Add-Check "Shared crypto avoids JVM-only helpers in commonMain" $sharedCryptoAvo
 
 $sharedIosPlatformUsesNativeSafeApis =
     $sharedIosKeychain -match "ExperimentalForeignApi::class" -and
-    $sharedIosKeychain -match [regex]::Escape("NSDictionary.dictionaryWithObjects") -and
+    $sharedIosKeychain -match [regex]::Escape("CFDictionaryCreate") -and
+    $sharedIosKeychain -match [regex]::Escape("CFBridgingRetain") -and
     $sharedIosKeychain -match [regex]::Escape("CFBridgingRelease") -and
     $sharedIosClock -match [regex]::Escape("time(null)") -and
     $sharedIosDefaults -match [regex]::Escape("objectForKey") -and
