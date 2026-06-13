@@ -1,7 +1,7 @@
 # ci-cd
 
 > Dependencies: `.github/workflows/ios-build.yml`, `ios/BuildPhases/validate-ios-static.ps1`, `ios/BuildPhases/build-shared.sh`, `ios/WaterValve.xcodeproj`
-> Current status: `workflow aligned with shared + Swift architecture; macOS runtime still unverified`
+> Current status: `workflow aligned with shared + Swift architecture; latest real macOS failure reproduced and patched locally; rerun pending`
 
 ## Tasks
 
@@ -23,7 +23,8 @@
 - The repository currently contains both a concrete KMP shared layer and a Swift-native iOS target.
 - The workflow now reflects that hybrid reality: shared validation/build first, then Xcode archive.
 - The workflow disables signing for archive work and now publishes both Debug and Release shared framework artifacts.
-- As of 2026-06-13, the public GitHub workflows API for `hcei/WaterValve` still returns `0` visible workflows, so there is no externally verifiable macOS run record yet.
+- A real PR run now exists at `actions/runs/27447771358`; it failed before Gradle execution because the macOS runner hit `./gradlew: Permission denied`.
+- The workflow and `build-shared.sh` now both invoke the Gradle wrapper through `bash`, and static validation explicitly checks that safety guard.
 - Windows cannot run `xcodebuild`; final proof still requires GitHub Actions or a local macOS/Xcode machine.
 
 ## Done Criteria

@@ -37,4 +37,4 @@ else
 fi
 
 echo "Building shared framework with tasks: ${TARGET_TASKS[*]}"
-./gradlew "${TARGET_TASKS[@]}" --no-daemon
+bash ./gradlew "${TARGET_TASKS[@]}" --no-daemon

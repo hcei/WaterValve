@@ -119,6 +119,10 @@ $buildScriptBuildsShared =
     $buildScript -match [regex]::Escape("FRAMEWORK_TASK_SUFFIX")
 Add-Check "build-shared script selects shared framework tasks per Xcode configuration" $buildScriptBuildsShared "build-shared.sh should support both Debug and Release shared framework tasks."
 
+$buildScriptInvokesGradleViaBash =
+    $buildScript -match [regex]::Escape('bash ./gradlew "${TARGET_TASKS[@]}" --no-daemon')
+Add-Check "build-shared script invokes Gradle via bash" $buildScriptInvokesGradleViaBash "build-shared.sh should call the Gradle wrapper through bash so macOS CI does not depend on the executable bit."
+
 $projectConfiguresSharedFrameworkSearch =
     $project -match [regex]::Escape("FRAMEWORK_SEARCH_PATHS") -and
     $project -match [regex]::Escape("shared/build/bin/iosArm64/debugFramework") -and
@@ -135,6 +139,10 @@ Add-Check "Windows shared validation script covers JVM test compilation and exec
 $workflowInvokesBuildScriptSafely =
     $workflow -match [regex]::Escape("bash ./ios/BuildPhases/build-shared.sh")
 Add-Check "Workflow invokes build-shared via bash" $workflowInvokesBuildScriptSafely "GitHub Actions should invoke build-shared.sh through bash so macOS runners do not depend on the executable bit."
+
+$workflowInvokesGradleWrapperViaBash =
+    $workflow -match [regex]::Escape("bash ./gradlew :shared:generateCommonMainWaterValveDbInterface :shared:compileKotlinJvm :shared:compileTestKotlinJvm :shared:jvmTest --no-daemon")
+Add-Check "Workflow invokes the Gradle wrapper via bash" $workflowInvokesGradleWrapperViaBash "GitHub Actions should call the root Gradle wrapper through bash so macOS runners do not fail on a missing executable bit."
 
 $workflowPinsXcodeSetup =
     $workflow -match [regex]::Escape("uses: maxim-lobanov/setup-xcode@v1") -and

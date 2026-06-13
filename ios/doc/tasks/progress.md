@@ -12,12 +12,12 @@
 | Login / WebView / Valve / Home / Record flows | Implemented | Static code review only |
 | Background refresh wiring | Implemented, unverified | Code and plist present; no runtime proof |
 | Update flow | Implemented; Android-only release mismatch mitigated, final iOS release path still unverified | Parsing/UI logic plus live release metadata review; distribution still needs confirmation |
-| GitHub Actions iOS workflow | Aligned to shared + Swift architecture, unverified | Workflow plus static validation updated, now including shared JVM test execution; no successful macOS run yet |
+| GitHub Actions iOS workflow | Aligned to shared + Swift architecture; rerun pending | Workflow plus static validation updated, now including bash-based Gradle wrapper invocation after a real macOS permission failure |
 
 ## Completion Summary
 
 - Shared KMP modules: `7 / 7` completed
-- Swift iOS modules: `7 / 10` completed
+- Swift iOS modules: `7 / 9` completed
 - CI/CD modules: `0 / 1` completed
 
 ## Current Module Status
@@ -43,6 +43,9 @@
 - [x] `ios-record`
 - [ ] `ios-background`
 - [ ] `ios-update`
+
+### CI/CD modules
+
 - [ ] `ci-cd`
 
 ## Notes
@@ -51,5 +54,6 @@
 - The repository also now contains a concrete `shared/` KMP layer that compiles and tests on JVM and is included in CI validation.
 - The Swift iOS target now has a minimal `import Shared` probe plus framework search/link settings, but the app's runtime business logic is still primarily implemented in Swift.
 - `ios/WaterValve.xcodeproj` now keeps `ios/BuildPhases/build-shared.sh` as an active shell phase, aligns its shared scheme to the native target, and uses framework paths that match actual KMP output directories.
+- A real GitHub Actions PR run exists and exposed a macOS `./gradlew` permission failure; the workflow and shared build script are now patched to invoke Gradle through `bash`, and the static validator covers both call sites.
 - `ios-background`, `ios-update`, and `ci-cd` remain unchecked because each still needs validation outside this Windows environment.
 - Windows cannot run `swift` or `xcodebuild` here, so all compile, archive, background-task, and live WebView conclusions remain limited to static review unless confirmed on macOS.

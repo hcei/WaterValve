@@ -35,7 +35,7 @@ jobs:
           xcode-version: latest-stable
 
       - name: Validate shared JVM module
-        run: ./gradlew :shared:generateCommonMainWaterValveDbInterface :shared:compileKotlinJvm :shared:compileTestKotlinJvm :shared:jvmTest --no-daemon
+        run: bash ./gradlew :shared:generateCommonMainWaterValveDbInterface :shared:compileKotlinJvm :shared:compileTestKotlinJvm :shared:jvmTest --no-daemon
 
       - name: Build shared iOS framework
         run: bash ./ios/BuildPhases/build-shared.sh
