@@ -363,6 +363,7 @@
 					"$(inherited)",
 					"-framework",
 					Shared,
+					"-lsqlite3",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.hgu.watervalve.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -397,6 +398,7 @@
 					"$(inherited)",
 					"-framework",
 					Shared,
+					"-lsqlite3",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.hgu.watervalve.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";

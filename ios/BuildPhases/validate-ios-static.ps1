@@ -149,6 +149,10 @@ $projectConfiguresSharedFrameworkSearch =
     $project -match [regex]::Escape("shared/build/bin/iosSimulatorArm64/releaseFramework")
 Add-Check "Xcode project declares shared framework search paths" $projectConfiguresSharedFrameworkSearch "project.pbxproj should expose Shared.framework search paths for device and simulator builds."
 
+$projectLinksSqliteForSharedFramework =
+    $project -match [regex]::Escape('"-lsqlite3"')
+Add-Check "Xcode project links sqlite3 for the shared framework" $projectLinksSqliteForSharedFramework "project.pbxproj should link libsqlite3 so SQLDelight symbols resolve during archive."
+
 $buildSharedBatCompilesTests =
     $sharedBuildBat -match [regex]::Escape(":shared:compileTestKotlinJvm") -and
     $sharedBuildBat -match [regex]::Escape(":shared:jvmTest")
