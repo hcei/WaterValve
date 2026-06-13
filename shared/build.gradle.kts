@@ -5,14 +5,14 @@ plugins {
 }
 
 kotlin {
-    // JVM target — 用于 Windows 本地编译验证（commonMain 代码正确性检查）
+    // JVM target ? ?? Windows ???????commonMain ????????
     jvm()
 
-    // iOS targets — 仅在 macOS 上编译，Windows 上自动跳过
+    // iOS targets ? ?? macOS ????Windows ?????
     iosArm64()
     iosSimulatorArm64()
 
-    // 启用 expect/actual classes（Kotlin 2.1.x 仍处于 Beta）
+    // ?? expect/actual classes?Kotlin 2.1.x ??? Beta?
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
@@ -44,6 +44,7 @@ kotlin {
 
         commonTest.dependencies {
             implementation(kotlin("test"))
+            implementation(libs.ktor.client.mock)
         }
 
         iosArm64Main.dependencies {

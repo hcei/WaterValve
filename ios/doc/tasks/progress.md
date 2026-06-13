@@ -7,7 +7,7 @@
 
 | Area | Status | Basis |
 |------|------|------|
-| KMP shared layer | Implemented broadly and framework-validated on macOS, but some shared business modules still lack live-runtime proof | Source review plus local JVM compile/test and successful GitHub Actions shared iOS framework builds |
+| KMP shared layer | Implemented broadly and framework-validated on macOS, but shared repository modules still lack live-runtime proof | Source review plus local JVM compile/test, captured crypto fixture tests, mocked auth-chain tests, and successful GitHub Actions shared iOS framework builds |
 | Swift iOS app structure | Implemented and archived successfully on GitHub-hosted macOS runners | Static review plus successful `xcodebuild archive` runs in GitHub Actions |
 | Login / WebView / Valve / Home / Record flows | Implemented, runtime unverified | Static code review only; no live iPhone/session proof yet |
 | Background refresh wiring | Implemented with logic-level tests; runtime unverified | Code, plist, and pure scheduling-policy tests exist; no real BGTask runtime proof yet |
@@ -16,7 +16,7 @@
 
 ## Completion Summary
 
-- Shared KMP modules: `4 / 7` completed
+- Shared KMP modules: `5 / 7` completed
 - Swift iOS modules: `1 / 9` completed
 - CI/CD modules: `1 / 1` completed
 
@@ -25,7 +25,7 @@
 ### Shared KMP modules
 
 - [x] `shared-models`
-- [ ] `shared-crypto`
+- [x] `shared-crypto`
 - [x] `shared-api`
 - [x] `shared-db`
 - [ ] `shared-auth-repository`
@@ -51,7 +51,7 @@
 ## Notes
 
 - The current iOS app under `ios/WaterValve/**` is implemented locally in Swift and should be evaluated on that basis.
-- The repository now contains a concrete `shared/` KMP layer that compiles/tests on JVM and builds successfully as an iOS framework on GitHub-hosted macOS runners, but `shared-auth-repository`, `shared-device-repository`, and `shared-crypto` still retain unmet runtime/parity acceptance checks.
+- The repository now contains a concrete `shared/` KMP layer that compiles/tests on JVM and builds successfully as an iOS framework on GitHub-hosted macOS runners; `shared-crypto` now has captured payload parity tests, while `shared-auth-repository` and `shared-device-repository` still retain unmet live-runtime acceptance checks.
 - The Swift iOS target now has a minimal `import Shared` probe plus framework search/link settings, but the app's runtime business logic is still primarily implemented in Swift.
 - `ios/WaterValve.xcodeproj` now keeps `ios/BuildPhases/build-shared.sh` as an active shell phase, aligns its shared scheme to the native target, uses framework paths that match actual KMP output directories, and links `-lsqlite3` so SQLDelight symbols resolve during archive.
 - Real GitHub Actions PR runs exposed a macOS `./gradlew` permission failure, then a KSP plugin mirror-resolution failure, and finally a missing SQLite linkage during archive; the workflow/shared build script now invoke Gradle through `bash`, CI skips China mirrors for official plugin resolution, the Xcode target links `libsqlite3`, and the static validator covers these guards.

@@ -27,6 +27,10 @@ object Constants {
     const val CHROME_IOS_UA: String =
         "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/131.0.0.0 Mobile/15E148 Safari/604.1"
     const val UIS_AUTHORIZATION: String = "Basic d2ViQXBwOndlYkFwcA=="
+    const val DES_KEY: String = "684523174589651002354157"
+    const val DES_IV: String = "00000000"
+    const val MERCHANT_KEY: String = "hzsun.com.uwc\u7684sign\u9A8C\u7B7E\u52A0\u5BC6key"
+    const val UIS_SIGN_KEY: String = "hzsun.com.uwc\u7684sign\u9A8C\u7B7E\u52A0\u5BC6key"
 
     const val KEYCHAIN_KEY_UWC_TOKEN: String = "uwc_token"
     const val KEYCHAIN_KEY_UIS_JWT: String = "uis_jwt"
