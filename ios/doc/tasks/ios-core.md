@@ -2,7 +2,7 @@
 
 > Dependencies: current Swift files under `ios/WaterValve/Core`, `ios/WaterValve/Navigation`, `ios/WaterValve/Resources`
 > Related requirements: `F8`
-> Current status: `implemented in Swift; not compiled in this Windows session`
+> Current status: `implemented in Swift; archived successfully on GitHub-hosted macOS runners`
 
 ## Tasks
 
@@ -16,7 +16,7 @@
 - [x] Add a minimal Swift import probe so the Xcode target proves `Shared.framework` can be consumed during real builds.
 - [x] Keep Xcode scheme/target wiring aligned with the native app target identifier.
 - [x] Replace the old abrupt banned-state exit path with support-contact actions.
-- [ ] Verify the current Xcode target builds successfully on macOS.
+- [x] Verify the current Xcode target builds successfully on macOS.
 
 ## Notes
 
@@ -29,4 +29,4 @@
 - [x] The root iOS app structure is present and internally wired.
 - [x] The Xcode project keeps the current shared build shell phase wired to the repository script.
 - [x] The Xcode target contains at least one concrete `Shared.framework` consumption point and matching project wiring.
-- [ ] A real Xcode build confirms the target settings and file graph are valid end to end.
+- [x] A real Xcode build confirms the target settings and file graph are valid end to end.

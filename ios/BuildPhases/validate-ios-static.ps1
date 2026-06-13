@@ -226,6 +226,13 @@ $hasBackgroundModes =
     $plist -match [regex]::Escape("<string>processing</string>")
 Add-Check "Info.plist keeps background modes" $hasBackgroundModes "Background fetch and processing modes should be declared."
 
+$iosVersionMatchesCurrentRelease =
+    $plist -match [regex]::Escape("<string>1.1.2</string>") -and
+    $plist -match [regex]::Escape("<string>5</string>") -and
+    $project -match [regex]::Escape("MARKETING_VERSION = 1.1.2;") -and
+    $project -match [regex]::Escape("CURRENT_PROJECT_VERSION = 5;")
+Add-Check "iOS bundle version matches the current project release line" $iosVersionMatchesCurrentRelease "The iOS Info.plist and Xcode target version settings should stay aligned with the repository's current 1.1.2 / build 5 release line so update checks do not permanently misidentify the app as 1.0."
+
 $bannedViewHasNoExit =
     $bannedView -notmatch [regex]::Escape("exit(0)")
 Add-Check "Banned view does not force process exit" $bannedViewHasNoExit "Banned view should not terminate the app process directly."

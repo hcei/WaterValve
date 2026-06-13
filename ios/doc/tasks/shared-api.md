@@ -1,7 +1,7 @@
 # shared-api
 
 > Dependencies: `shared-models`, `shared-crypto`
-> Current status: `implemented in shared/commonMain; compile-validated on JVM, iOS framework build still needs macOS proof`
+> Current status: `implemented in shared/commonMain; JVM-validated and macOS framework build proven in CI`
 
 ## Tasks
 
@@ -9,7 +9,7 @@
 - [x] Implement `SyncApi` for `/api/devices/{userId}` pull and push.
 - [x] Implement `ReleaseApi` for GitHub, Gitee, and PythonAnywhere latest-release lookups.
 - [x] Align URL paths and bridge-related constants with the Android source of truth.
-- [ ] Build and verify the shared iOS framework on macOS.
+- [x] Build and verify the shared iOS framework on macOS.
 
 ## Notes
 
@@ -20,4 +20,4 @@
 
 - [x] Shared API source files exist under `shared/src/commonMain`.
 - [x] The shared module compiles on JVM.
-- [ ] macOS validates the iOS framework outputs and endpoint behavior.
+- [x] macOS validates the iOS framework outputs.
