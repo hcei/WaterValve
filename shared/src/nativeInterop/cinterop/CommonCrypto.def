@@ -1,4 +1,2 @@
-headers = CommonCrypto/CommonCrypto.h
-headerFilter = CommonCrypto/*
-compilerOpts = -fmodules
+modules = CommonCrypto
 package = com.hgu.watervalve.shared.nativecrypto
