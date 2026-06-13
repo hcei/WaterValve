@@ -19,6 +19,7 @@ let package = Package(
             sources: [
                 "Core/APIClient.swift",
                 "Core/AppConstants.swift",
+                "Valve/ValveBridgeLogic.swift",
                 "Background/BackgroundRefreshPolicy.swift",
                 "Update/UpdateInfo.swift",
                 "Update/UpdateRelease.swift",

@@ -51,6 +51,7 @@ $sharedIosDefaultsPath = Join-Path $repoRoot "shared\src\iosMain\kotlin\com\hgu\
 $sharedIosBridgePath = Join-Path $repoRoot "shared\src\iosMain\kotlin\com\hgu\watervalve\shared\platform\IosSharedBridge.kt"
 $homeViewPath = Join-Path $root "WaterValve\UI\Home\HomeView.swift"
 $valveViewPath = Join-Path $root "WaterValve\UI\Valve\ValveView.swift"
+$valveBridgeLogicPath = Join-Path $root "WaterValve\Valve\ValveBridgeLogic.swift"
 $webViewPath = Join-Path $root "WaterValve\UI\WebView\WebViewScreen.swift"
 $bannedViewPath = Join-Path $root "WaterValve\UI\Common\BannedAlertView.swift"
 $backgroundPath = Join-Path $root "WaterValve\Background\BackgroundTaskManager.swift"
@@ -62,6 +63,7 @@ $sharedAdaptersPath = Join-Path $root "WaterValve\Core\SharedAdapters.swift"
 $updateReleasePath = Join-Path $root "WaterValve\Update\UpdateRelease.swift"
 $updateReleaseParserPath = Join-Path $root "WaterValve\Update\UpdateReleaseParser.swift"
 $updateDecisionEnginePath = Join-Path $root "WaterValve\Update\UpdateDecisionEngine.swift"
+$valveBridgeLogicTestsPath = Join-Path $root "Tests\WaterValveLogicTests\ValveBridgeLogicTests.swift"
 
 $project = Require-File $projectPath
 $plist = Require-File $plistPath
@@ -84,6 +86,7 @@ $sharedIosDefaults = Require-File $sharedIosDefaultsPath
 $sharedIosBridge = Require-File $sharedIosBridgePath
 $homeView = Require-File $homeViewPath
 $valveView = Require-File $valveViewPath
+$valveBridgeLogic = Require-File $valveBridgeLogicPath
 $webView = Require-File $webViewPath
 $bannedView = Require-File $bannedViewPath
 $background = Require-File $backgroundPath
@@ -95,6 +98,7 @@ $sharedAdapters = Require-File $sharedAdaptersPath
 $updateRelease = Require-File $updateReleasePath
 $updateReleaseParser = Require-File $updateReleaseParserPath
 $updateDecisionEngine = Require-File $updateDecisionEnginePath
+$valveBridgeLogicTests = Require-File $valveBridgeLogicTestsPath
 
 $requiredFiles = @(
     "Package.swift",
@@ -109,6 +113,7 @@ $requiredFiles = @(
     "WaterValve\UI\Home\HomeView.swift",
     "WaterValve\UI\QRScanner\QRScannerView.swift",
     "WaterValve\UI\Valve\ValveView.swift",
+    "WaterValve\Valve\ValveBridgeLogic.swift",
     "WaterValve\UI\Record\RecordView.swift",
     "WaterValve\UI\WebView\WebViewScreen.swift",
     "WaterValve\Update\UpdateRelease.swift",
@@ -131,6 +136,7 @@ $projectHasActiveSwiftSources =
     $project -match [regex]::Escape("UpdateRelease.swift") -and
     $project -match [regex]::Escape("UpdateReleaseParser.swift") -and
     $project -match [regex]::Escape("UpdateDecisionEngine.swift") -and
+    $project -match [regex]::Escape("ValveBridgeLogic.swift") -and
     $project -match [regex]::Escape("SharedAdapters.swift") -and
     $project -match [regex]::Escape("SharedBridgeProbe.swift")
 Add-Check "Xcode project includes the active Swift app sources" $projectHasActiveSwiftSources "project.pbxproj should keep the current Swift target source set wired in."
@@ -246,9 +252,21 @@ Add-Check "WebView wrapper supports script-message bridge" $webViewHasScriptBrid
 $valveViewKeepsBridgeLogic =
     $valveView -match [regex]::Escape("@MainActor") -and
     $valveView -match [regex]::Escape("pendingScanCallback") -and
-    $valveView -match [regex]::Escape("window.__valveBridge") -and
-    $valveView -match [regex]::Escape("waterValveScanResult")
+    $valveView -match [regex]::Escape("ValveBridgeLogic.buildTokenInjectionScript") -and
+    $valveView -match [regex]::Escape("ValveBridgeLogic.buildScanResultEventScript") -and
+    $valveBridgeLogic -match [regex]::Escape("window.__valveBridge") -and
+    $valveBridgeLogic -match [regex]::Escape("waterValveScanResult") -and
+    $valveBridgeLogic -match [regex]::Escape("success:true")
 Add-Check "Valve view model is main-actor isolated and keeps callback bridge logic" $valveViewKeepsBridgeLogic "Valve page should keep both script-message and callback/event bridge paths."
+
+$valveLogicTestsCoverBridgeRules =
+    $valveBridgeLogicTests -match [regex]::Escape("buildValveURL") -and
+    $valveBridgeLogicTests -match [regex]::Escape("buildTokenInjectionScript") -and
+    $valveBridgeLogicTests -match [regex]::Escape("ValveBridgePayload.parse") -and
+    $valveBridgeLogicTests -match [regex]::Escape("parseScriptMessage") -and
+    $valveBridgeLogicTests -match [regex]::Escape("buildScanResultEventScript") -and
+    $valveBridgeLogicTests -match [regex]::Escape("buildScanCallbackScript")
+Add-Check "Swift package tests cover valve bridge URL and payload rules" $valveLogicTestsCoverBridgeRules "Valve bridge extraction should have dedicated Swift logic tests so CI can catch regressions without a full iOS runtime."
 
 $homeViewUsesDeleteConfirmation =
     $homeView -match [regex]::Escape("confirmationDialog") -and
@@ -285,9 +303,10 @@ Add-Check "Swift update repository tolerates proxy-wrapped release payloads" $sw
 
 $swiftPackageSeparatesUpdateLogic =
     $swiftPackage -match [regex]::Escape('name: "WaterValveLogic"') -and
+    $swiftPackage -match [regex]::Escape('Valve/ValveBridgeLogic.swift') -and
     $swiftPackage -match [regex]::Escape('Update/UpdateDecisionEngine.swift') -and
     $swiftPackage -match [regex]::Escape('Background/BackgroundRefreshPolicy.swift')
-Add-Check "Swift package exposes testable update and background logic" $swiftPackageSeparatesUpdateLogic "ios/Package.swift should surface the pure Swift update/background policy code so macOS CI can test it without a full app test target."
+Add-Check "Swift package exposes testable valve, update, and background logic" $swiftPackageSeparatesUpdateLogic "ios/Package.swift should surface the pure Swift valve/update/background policy code so macOS CI can test it without a full app test target."
 
 $loginViewShowsStagedProgress =
     $loginView -match [regex]::Escape("@MainActor") -and

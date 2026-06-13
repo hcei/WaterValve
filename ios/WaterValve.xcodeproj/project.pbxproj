@@ -36,6 +36,7 @@
 		4F03D8852CFA010100000021 /* UpdateRelease.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000021 /* UpdateRelease.swift */; };
 		4F03D8852CFA010100000022 /* UpdateReleaseParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000022 /* UpdateReleaseParser.swift */; };
 		4F03D8852CFA010100000023 /* UpdateDecisionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000023 /* UpdateDecisionEngine.swift */; };
+		4F03D8852CFA010100000024 /* ValveBridgeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000024 /* ValveBridgeLogic.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -70,6 +71,7 @@
 		4F03D8852CFA100100000021 /* UpdateRelease.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateRelease.swift; sourceTree = "<group>"; };
 		4F03D8852CFA100100000022 /* UpdateReleaseParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateReleaseParser.swift; sourceTree = "<group>"; };
 		4F03D8852CFA100100000023 /* UpdateDecisionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateDecisionEngine.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000024 /* ValveBridgeLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValveBridgeLogic.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -235,6 +237,7 @@
 			sourceTree = "<group>";
 			children = (
 				4F03D8852CFA100100000009 /* ValveView.swift */,
+				4F03D8852CFA100100000024 /* ValveBridgeLogic.swift */,
 			);
 		};
 		4F03D8852CFA000100000010 /* Record */ = {
@@ -340,6 +343,7 @@
 				4F03D8852CFA010100000021 /* UpdateRelease.swift in Sources */,
 				4F03D8852CFA010100000022 /* UpdateReleaseParser.swift in Sources */,
 				4F03D8852CFA010100000023 /* UpdateDecisionEngine.swift in Sources */,
+				4F03D8852CFA010100000024 /* ValveBridgeLogic.swift in Sources */,
 				4F03D8852CFA01010000000E /* UpdateService.swift in Sources */,
 				4F03D8852CFA01010000000F /* UpdateAlertView.swift in Sources */,
 				4F03D8852CFA010100000011 /* AppConstants.swift in Sources */,

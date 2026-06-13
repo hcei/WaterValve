@@ -140,53 +140,35 @@ final class ValveViewModel: ObservableObject {
     func handleNativeScanResult(_ result: String) {
         guard !result.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         bannerMessage = "Native scan completed."
-        let escaped = escape(result)
-        webView?.injectJavaScript("window.__waterValveLastScan='\(escaped)';")
-        webView?.injectJavaScript("window.dispatchEvent(new CustomEvent('waterValveScanResult',{detail:{result:'\(escaped)'}}));")
+        webView?.injectJavaScript(ValveBridgeLogic.buildScanResultEventScript(result: result))
         if let callback = pendingScanCallback?.trimmingCharacters(in: .whitespacesAndNewlines), !callback.isEmpty {
-            let callbackScript = buildScanCallbackScript(callback: callback, escapedResult: escaped)
+            let callbackScript = ValveBridgeLogic.buildScanCallbackScript(callback: callback, result: result)
             webView?.injectJavaScript(callbackScript)
         }
         pendingScanCallback = nil
     }
 
     private func buildValveURL(for device: Device) -> URL? {
-        if let direct = URL(string: device.qrURL),
-           let scheme = direct.scheme,
-           scheme.hasPrefix("http") {
-            return direct
-        }
-
-        if !device.qrURL.isEmpty {
-            let encoded = device.qrURL.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? device.id
-            return URL(string: "\(AppConstants.uwcSpaBaseURL.absoluteString)#/openValve?deviceId=\(encoded)")
-        }
-
-        return URL(string: "\(AppConstants.uwcSpaBaseURL.absoluteString)#/openValve")
+        ValveBridgeLogic.buildValveURL(deviceId: device.id, qrURL: device.qrURL)
     }
 
     private func buildTokenInjectionScript(session: UserSession) -> String {
-        var script = "(function(){try{"
-        script += "if(!window.wx||!window.wx.ready){window.wx={ready:function(cb){if(cb)cb()},config:function(){},error:function(){},checkJsApi:function(opts){if(opts&&opts.success)opts.success({checkResult:{}})},invoke:function(){}};}"
-        script += "window.__waterValveBridge={scan:function(){window.location.href='com.hzsun.h5call://bridge?paramjson='+encodeURIComponent(JSON.stringify({action:'openScan',callback:'nativeScan'}));}};"
-        script += "window.__valveBridge={token:'\(escape(session.uwcToken))',userId:'\(escape(session.userId))'};"
-        script += "localStorage.setItem('uwcToken','\(escape(session.uwcToken))');"
-        script += "localStorage.setItem('uisToken','\(escape(session.uisToken))');"
-        script += "localStorage.setItem('uiastoken','\(escape(session.uisToken))');"
-        script += "localStorage.setItem('uwcAccNum','\(escape(session.accNum))');"
-        script += "localStorage.setItem('uwcEpid','\(escape(session.epId))');"
-        script += "localStorage.setItem('uwcUserId','\(escape(session.userId))');"
-        script += "localStorage.setItem('uwcPerCode','\(escape(session.perCode))');"
-        script += "localStorage.setItem('wxMark','1');"
-        script += "localStorage.setItem('isSdk',JSON.stringify(true));"
-        script += "}catch(e){console.error('[WaterValve iOS] '+e.message);}})();"
-        return script
+        ValveBridgeLogic.buildTokenInjectionScript(
+            session: ValveSessionSnapshot(
+                userId: session.userId,
+                accNum: session.accNum,
+                epId: session.epId,
+                perCode: session.perCode,
+                uisToken: session.uisToken,
+                uwcToken: session.uwcToken
+            )
+        )
     }
 
     private func handle(url: URL, deviceName: String) {
         guard url.absoluteString.hasPrefix(AppConstants.h5CallSchemePrefix) else { return }
 
-        let payload = H5CallPayload.parse(url: url)
+        let payload = ValveBridgePayload.parse(url: url)
         switch payload?.action {
         case "openScan":
             bannerMessage = "The page requested native scanning."
@@ -204,23 +186,23 @@ final class ValveViewModel: ObservableObject {
     }
 
     private func handleScriptMessage(_ message: Any, fallbackDeviceName: String) {
-        let payload = parseBridgePayload(message)
+        let payload = ValveBridgeLogic.parseScriptMessage(message)
         let event = payload["event"] as? String ?? payload["action"] as? String ?? ""
 
         switch event {
         case "valveOpened":
-            let deviceName = stringValue(payload["deviceName"]).ifEmpty(fallbackDeviceName)
-            let timestamp = stringValue(payload["timestamp"])
+            let deviceName = ValveBridgeLogic.stringValue(payload["deviceName"]).ifEmpty(fallbackDeviceName)
+            let timestamp = ValveBridgeLogic.stringValue(payload["timestamp"])
             recordValveActionIfNeeded(deviceName: deviceName, eventKey: "valveOpened:\(deviceName):\(timestamp)")
             bannerMessage = "Recorded a valve action for \(deviceName)."
         case "error":
-            let message = stringValue(payload["message"]).ifEmpty("The valve page reported an unknown error.")
+            let message = ValveBridgeLogic.stringValue(payload["message"]).ifEmpty("The valve page reported an unknown error.")
             bannerMessage = message
         case "closeWin":
             bannerMessage = "The page requested a close action."
             closePage?()
         case "openScan":
-            pendingScanCallback = stringValue(payload["callback"])
+            pendingScanCallback = ValveBridgeLogic.stringValue(payload["callback"])
             bannerMessage = "The page requested native scanning."
             openScanner?()
         default:
@@ -235,46 +217,6 @@ final class ValveViewModel: ObservableObject {
         guard lastRecordedEventKey != eventKey else { return }
         lastRecordedEventKey = eventKey
         container?.addRecord(deviceName: deviceName)
-    }
-
-    private func parseBridgePayload(_ message: Any) -> [String: Any] {
-        if let object = message as? [String: Any] {
-            return object
-        }
-
-        if let text = message as? String,
-           let data = text.data(using: .utf8),
-           let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
-            return object
-        }
-
-        return [:]
-    }
-
-    private func buildScanCallbackScript(callback: String, escapedResult: String) -> String {
-        let escapedCallback = escape(callback)
-        return """
-        (function(){
-            try{
-                var callbackName='\(escapedCallback)';
-                var target=window[callbackName];
-                if(typeof target==='function'){
-                    target('\(escapedResult)');
-                    return;
-                }
-                var path=callbackName.split('.');
-                var scope=window;
-                for(var i=0;i<path.length;i++){
-                    scope=scope && scope[path[i]];
-                }
-                if(typeof scope==='function'){
-                    scope('\(escapedResult)');
-                }
-            }catch(e){
-                console.error('[WaterValve iOS] '+e.message);
-            }
-        })();
-        """
     }
 
     private func injectSessionCookie(_ sessionCookie: String, into webView: WKWebView) {
@@ -294,47 +236,6 @@ final class ValveViewModel: ObservableObject {
         }
     }
 
-    private func escape(_ string: String) -> String {
-        string
-            .replacingOccurrences(of: "\\", with: "\\\\")
-            .replacingOccurrences(of: "'", with: "\\'")
-            .replacingOccurrences(of: "\n", with: "\\n")
-            .replacingOccurrences(of: "\r", with: "\\r")
-    }
-
-    private func stringValue(_ value: Any?) -> String {
-        switch value {
-        case let string as String:
-            return string
-        case let number as NSNumber:
-            if floor(number.doubleValue) == number.doubleValue {
-                return String(Int64(number.doubleValue))
-            }
-            return number.stringValue
-        default:
-            return ""
-        }
-    }
-}
-
-private struct H5CallPayload {
-    let action: String
-    let callback: String
-
-    static func parse(url: URL) -> H5CallPayload? {
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-              let paramJSON = components.queryItems?.first(where: { $0.name == "paramjson" })?.value,
-              let decoded = paramJSON.removingPercentEncoding,
-              let data = decoded.data(using: .utf8),
-              let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-            return nil
-        }
-
-        return H5CallPayload(
-            action: object["action"] as? String ?? "",
-            callback: object["callback"] as? String ?? ""
-        )
-    }
 }
 
 private extension String {

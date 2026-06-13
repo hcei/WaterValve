@@ -5,14 +5,14 @@ plugins {
 }
 
 kotlin {
-    // JVM target ? ?? Windows ???????commonMain ????????
+    // JVM target — 用于 Windows 本地编译验证（commonMain 代码正确性检查）
     jvm()
 
-    // iOS targets ? ?? macOS ????Windows ?????
+    // iOS targets — 仅在 macOS 上编译，Windows 上自动跳过
     iosArm64()
     iosSimulatorArm64()
 
-    // ?? expect/actual classes?Kotlin 2.1.x ??? Beta?
+    // 启用 expect/actual classes（Kotlin 2.1.x 仍处于 Beta）
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
@@ -58,6 +58,10 @@ kotlin {
 
         jvmMain.dependencies {
             implementation(libs.ktor.client.okhttp)
+        }
+
+        jvmTest.dependencies {
+            implementation(libs.sqldelight.sqlite.driver)
         }
     }
 }

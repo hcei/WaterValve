@@ -5,29 +5,18 @@ import com.hgu.watervalve.shared.data.repository.AuthRepository
 import com.hgu.watervalve.shared.data.repository.LoginError
 import com.hgu.watervalve.shared.data.repository.LoginResult
 import com.hgu.watervalve.shared.data.repository.LoginState
-import com.hgu.watervalve.shared.data.remote.crypto.UwcCrypto
 import com.hgu.watervalve.shared.platform.KeychainWrapper
 import com.hgu.watervalve.shared.platform.UserDefaultsWrapper
 import com.hgu.watervalve.shared.util.Constants.KEYCHAIN_KEY_SESSION_COOKIE
 import com.hgu.watervalve.shared.util.Constants.KEYCHAIN_KEY_UIS_JWT
 import com.hgu.watervalve.shared.util.Constants.KEYCHAIN_KEY_USER_ID
 import com.hgu.watervalve.shared.util.Constants.KEYCHAIN_KEY_UWC_TOKEN
-import com.hgu.watervalve.shared.util.Constants.LOGIN_BY_TOKEN_PATH
 import com.hgu.watervalve.shared.util.Constants.UD_KEY_IS_BANNED
 import com.hgu.watervalve.shared.util.Constants.UD_KEY_LAST_REFRESH_TIME
 import com.hgu.watervalve.shared.util.Constants.UD_KEY_NICKNAME
 import com.hgu.watervalve.shared.util.Constants.UD_KEY_USER_ACC_NUM
 import com.hgu.watervalve.shared.util.Constants.UD_KEY_USER_EP_ID
 import com.hgu.watervalve.shared.util.Constants.UD_KEY_USER_PER_CODE
-import com.hgu.watervalve.shared.util.Constants.UIS_CAS_LOGIN_PATH
-import com.hgu.watervalve.shared.util.Constants.UIS_TOKEN_PATH
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.mock.MockEngine
-import io.ktor.client.engine.mock.respond
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.headersOf
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -57,7 +46,7 @@ class AuthRepositoryTest {
                 setBool(UD_KEY_IS_BANNED, true)
             }
             val repository = createRepository(
-                api = createApi(),
+                api = AuthRepositoryTestFixtures.createApi(),
                 keychain = keychain,
                 userDefaults = userDefaults,
             )
@@ -88,7 +77,7 @@ class AuthRepositoryTest {
             }
             val userDefaults = UserDefaultsWrapper()
             val repository = createRepository(
-                api = createApi(expectedJwt = "stored-uis-jwt"),
+                api = AuthRepositoryTestFixtures.createApi(expectedJwt = "stored-uis-jwt"),
                 keychain = keychain,
                 userDefaults = userDefaults,
             )
@@ -132,7 +121,7 @@ class AuthRepositoryTest {
     }
 
     private fun createRepository(
-        api: UwcApi = createApi(),
+        api: UwcApi = AuthRepositoryTestFixtures.createApi(),
         keychain: KeychainWrapper = KeychainWrapper(),
         userDefaults: UserDefaultsWrapper = UserDefaultsWrapper(),
     ): AuthRepository {
@@ -141,50 +130,5 @@ class AuthRepositoryTest {
             keychain = keychain,
             userDefaults = userDefaults,
         )
-    }
-
-    private companion object {
-        fun createApi(expectedJwt: String = "uis-jwt-456"): UwcApi {
-            return UwcApi(
-                HttpClient(
-                    MockEngine { request ->
-                        when {
-                            request.method == HttpMethod.Get && request.url.encodedPath.endsWith(UIS_CAS_LOGIN_PATH) -> {
-                                respond(
-                                    content = "",
-                                    status = HttpStatusCode.OK,
-                                    headers = headersOf(HttpHeaders.SetCookie, "SESSION=session-cookie-789; Path=/; HttpOnly"),
-                                )
-                            }
-
-                            request.method == HttpMethod.Post && request.url.encodedPath.endsWith(UIS_TOKEN_PATH) -> {
-                                respond(
-                                    content = """{"data":{"value":"$expectedJwt"}}""",
-                                    status = HttpStatusCode.OK,
-                                    headers = headersOf(HttpHeaders.ContentType, "application/json"),
-                                )
-                            }
-
-                            request.method == HttpMethod.Post && request.url.encodedPath.endsWith(LOGIN_BY_TOKEN_PATH) -> {
-                                require(request.headers["token"] == expectedJwt)
-                                respond(
-                                    content = """{"resultMap":"${encryptedLoginByTokenResultMap()}"}""",
-                                    status = HttpStatusCode.OK,
-                                    headers = headersOf(HttpHeaders.ContentType, "application/json"),
-                                )
-                            }
-
-                            else -> error("Unexpected request: ${request.method.value} ${request.url}")
-                        }
-                    }
-                )
-            )
-        }
-
-        fun encryptedLoginByTokenResultMap(): String {
-            return UwcCrypto.encrypt(
-                """{"code":"1","msg":"SUCCESS","data":"{\"token\":\"uwc-token-123\",\"userId\":\"u-1001\",\"nickName\":\"Alice\",\"accNum\":\"acc-77\",\"epId\":\"ep-9\",\"perCode\":\"pc-1\"}"}"""
-            )
-        }
     }
 }
