@@ -266,6 +266,32 @@ $swiftBridgeUsesSwiftVisibleSharedNames =
     $sharedAdapters -cnotmatch [regex]::Escape("SharedLoginError")
 Add-Check "Swift bridge references Swift-visible Shared framework symbol names" $swiftBridgeUsesSwiftVisibleSharedNames "Swift sources should use the Kotlin/Native swift_name-exported symbols instead of the Objective-C-prefixed Shared* names."
 
+$swiftBridgeMatchesSharedAsyncInterop =
+    $repositories -cmatch "@MainActor\s+final class AuthRepository" -and
+    $repositories -cmatch "@MainActor\s+final class DeviceRepository" -and
+    $repositories -cmatch [regex]::Escape("CheckedContinuation<LoginResult, Error>") -and
+    $repositories -cmatch [regex]::Escape("CheckedContinuation<IosDeviceSnapshot, Error>") -and
+    $repositories -cmatch [regex]::Escape("CheckedContinuation<Void, Error>") -and
+    $repositories -cmatch [regex]::Escape("renameDevice(deviceId: id, name: name) { error in") -and
+    $repositories -cmatch [regex]::Escape("starDevice(deviceId: id, starred: !current) { error in") -and
+    $repositories -cmatch [regex]::Escape("deleteDevice(deviceId: id) { error in") -and
+    $repositories -cmatch [regex]::Escape("pullFromCloud { error in") -and
+    $repositories -cmatch [regex]::Escape("pushToCloud { error in") -and
+    $repositories -cmatch [regex]::Escape("addRecord(deviceName: deviceName) { error in") -and
+    $repositories -cmatch [regex]::Escape("deleteRecord(id: snapshot.id) { error in") -and
+    $repositories -cmatch [regex]::Escape("deleteAllRecords { error in") -and
+    $repositories -cnotmatch [regex]::Escape("renameDevice(deviceId: id, name: name) { _, error in") -and
+    $repositories -cnotmatch [regex]::Escape("starDevice(deviceId: id, starred: !current) { _, error in") -and
+    $repositories -cnotmatch [regex]::Escape("deleteDevice(deviceId: id) { _, error in") -and
+    $repositories -cnotmatch [regex]::Escape("pullFromCloud { _, error in") -and
+    $repositories -cnotmatch [regex]::Escape("pushToCloud { _, error in") -and
+    $repositories -cnotmatch [regex]::Escape("addRecord(deviceName: deviceName) { _, error in") -and
+    $repositories -cnotmatch [regex]::Escape("deleteRecord(id: snapshot.id) { _, error in") -and
+    $repositories -cnotmatch [regex]::Escape("deleteAllRecords { _, error in") -and
+    $sharedAdapters -cmatch [regex]::Escape("Self.stableUUIDString") -and
+    $background -cmatch [regex]::Escape("let authRepository = self.authRepository")
+Add-Check "Swift bridge matches current async Shared interop and actor isolation" $swiftBridgeMatchesSharedAsyncInterop "Swift repository wrappers should mirror the current Kotlin/Native async export shapes and keep AppContainer-backed bridge access on the main actor."
+
 $progressTracksRepoScope =
     $progress -match [regex]::Escape("shared-api") -and
     $progress -match [regex]::Escape("ios-core") -and

@@ -60,7 +60,8 @@ final class BackgroundTaskManager {
         isRefreshing = true
         scheduleNextRefresh()
 
-        let work = Task { [weak self] in
+        let authRepository = self.authRepository
+        let work = Task {
             await authRepository?.refreshUwcToken() ?? false
         }
 

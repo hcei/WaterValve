@@ -41,7 +41,7 @@ extension Device {
 extension WaterRecord {
     init(shared: IosWaterRecordSnapshot) {
         self.init(
-            id: UUID(uuidString: stableUUIDString(id: shared.id, deviceName: shared.deviceName, timestamp: shared.timestamp)) ?? UUID(),
+            id: UUID(uuidString: Self.stableUUIDString(id: shared.id, deviceName: shared.deviceName, timestamp: shared.timestamp)) ?? UUID(),
             deviceName: shared.deviceName,
             timestamp: Date(timeIntervalSince1970: TimeInterval(shared.timestamp) / 1000)
         )

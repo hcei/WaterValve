@@ -44,6 +44,7 @@ enum DeviceRepositoryError: LocalizedError {
     }
 }
 
+@MainActor
 final class AuthRepository {
     private unowned let container: AppContainer
 
@@ -91,7 +92,7 @@ final class AuthRepository {
             }
         }
 
-        let result = try await withCheckedThrowingContinuation { continuation in
+        let result: LoginResult = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<LoginResult, Error>) in
             container.sharedBridge.authRepository.exchangeCasTicket(ticket: ticket) { result, error in
                 if let error {
                     continuation.resume(throwing: AuthRepositoryError.network(sharedErrorMessage(error as NSError)))
@@ -151,6 +152,7 @@ final class AuthRepository {
     }
 }
 
+@MainActor
 final class DeviceRepository {
     private unowned let container: AppContainer
 
@@ -172,7 +174,7 @@ final class DeviceRepository {
     @discardableResult
     func addDevice(qrURL: String, name: String? = nil) async throws -> Device {
         let normalized = qrURL.trimmingCharacters(in: .whitespacesAndNewlines)
-        let newDevice = try await withCheckedThrowingContinuation { continuation in
+        let newDevice: IosDeviceSnapshot = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<IosDeviceSnapshot, Error>) in
             container.sharedBridge.addDevice(qrUrl: normalized) { result, error in
                 if let error {
                     continuation.resume(throwing: self.mapDeviceError(error as NSError))
@@ -198,8 +200,8 @@ final class DeviceRepository {
     }
 
     func renameDevice(id: String, name: String) async throws {
-        try await withCheckedThrowingContinuation { continuation in
-            container.sharedBridge.renameDevice(deviceId: id, name: name) { _, error in
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            container.sharedBridge.renameDevice(deviceId: id, name: name) { error in
                 if let error {
                     continuation.resume(throwing: self.mapDeviceError(error as NSError))
                 } else {
@@ -212,8 +214,8 @@ final class DeviceRepository {
 
     func toggleStar(id: String) async throws {
         let current = devices.first(where: { $0.id == id })?.starred ?? false
-        try await withCheckedThrowingContinuation { continuation in
-            container.sharedBridge.starDevice(deviceId: id, starred: !current) { _, error in
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            container.sharedBridge.starDevice(deviceId: id, starred: !current) { error in
                 if let error {
                     continuation.resume(throwing: self.mapDeviceError(error as NSError))
                 } else {
@@ -225,8 +227,8 @@ final class DeviceRepository {
     }
 
     func deleteDevice(id: String) async throws {
-        try await withCheckedThrowingContinuation { continuation in
-            container.sharedBridge.deleteDevice(deviceId: id) { _, error in
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            container.sharedBridge.deleteDevice(deviceId: id) { error in
                 if let error {
                     continuation.resume(throwing: self.mapDeviceError(error as NSError))
                 } else {
@@ -238,8 +240,8 @@ final class DeviceRepository {
     }
 
     func pullFromCloud() async throws {
-        try await withCheckedThrowingContinuation { continuation in
-            container.sharedBridge.pullFromCloud { _, error in
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            container.sharedBridge.pullFromCloud { error in
                 if let error {
                     continuation.resume(throwing: self.mapDeviceError(error as NSError))
                 } else {
@@ -252,8 +254,8 @@ final class DeviceRepository {
     }
 
     func pushToCloud() async throws {
-        try await withCheckedThrowingContinuation { continuation in
-            container.sharedBridge.pushToCloud { _, error in
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            container.sharedBridge.pushToCloud { error in
                 if let error {
                     continuation.resume(throwing: self.mapDeviceError(error as NSError))
                 } else {
@@ -265,8 +267,8 @@ final class DeviceRepository {
 
     func addRecord(deviceName: String) async {
         do {
-            try await withCheckedThrowingContinuation { continuation in
-                container.sharedBridge.addRecord(deviceName: deviceName) { _, error in
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                container.sharedBridge.addRecord(deviceName: deviceName) { error in
                     if let error {
                         continuation.resume(throwing: self.mapDeviceError(error as NSError))
                     } else {
@@ -289,8 +291,8 @@ final class DeviceRepository {
         guard let snapshot else { return }
 
         do {
-            try await withCheckedThrowingContinuation { continuation in
-                container.sharedBridge.deleteRecord(id: snapshot.id) { _, error in
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                container.sharedBridge.deleteRecord(id: snapshot.id) { error in
                     if let error {
                         continuation.resume(throwing: self.mapDeviceError(error as NSError))
                     } else {
@@ -306,8 +308,8 @@ final class DeviceRepository {
 
     func clearRecords() async {
         do {
-            try await withCheckedThrowingContinuation { continuation in
-                container.sharedBridge.deleteAllRecords { _, error in
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                container.sharedBridge.deleteAllRecords { error in
                     if let error {
                         continuation.resume(throwing: self.mapDeviceError(error as NSError))
                     } else {
