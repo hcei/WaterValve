@@ -258,9 +258,9 @@ $sharedCryptoAvoidsJvmOnlyApis =
 Add-Check "Shared crypto avoids JVM-only helpers in commonMain" $sharedCryptoAvoidsJvmOnlyApis "Kotlin/Native builds should not depend on JVM-only APIs such as toSortedMap, Integer.rotateLeft, or String.format in commonMain crypto code."
 
 $sharedIosPlatformUsesNativeSafeApis =
-    $sharedIosKeychain -match [regex]::Escape("@OptIn(ExperimentalForeignApi::class)") -and
-    $sharedIosKeychain -match [regex]::Escape("CFDictionaryCreateMutable") -and
-    $sharedIosKeychain -match [regex]::Escape("CFBridgingRetain") -and
+    $sharedIosKeychain -match "ExperimentalForeignApi::class" -and
+    $sharedIosKeychain -match [regex]::Escape("NSDictionary.dictionaryWithObjects") -and
+    $sharedIosKeychain -match [regex]::Escape("CFBridgingRelease") -and
     $sharedIosClock -match [regex]::Escape("time(null)") -and
     $sharedIosDefaults -match [regex]::Escape("objectForKey") -and
     $sharedIosDefaults -notmatch [regex]::Escape("stringForKey")
