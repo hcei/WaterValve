@@ -35,6 +35,7 @@ $plistPath = Join-Path $root "WaterValve\Resources\Info.plist"
 $buildScriptPath = Join-Path $root "BuildPhases\build-shared.sh"
 $sharedBuildBatPath = Join-Path $repoRoot "build_shared.bat"
 $workflowPath = Join-Path $repoRoot ".github\workflows\ios-build.yml"
+$settingsPath = Join-Path $repoRoot "settings.gradle.kts"
 $progressPath = Join-Path $root "doc\tasks\progress.md"
 $schemePath = Join-Path $root "WaterValve.xcodeproj\xcshareddata\xcschemes\WaterValve.xcscheme"
 $sharedApiPath = Join-Path $repoRoot "shared\src\commonMain\kotlin\com\hgu\watervalve\shared\data\remote\api\UwcApi.kt"
@@ -55,6 +56,7 @@ $plist = Require-File $plistPath
 $buildScript = Require-File $buildScriptPath
 $sharedBuildBat = Require-File $sharedBuildBatPath
 $workflow = Require-File $workflowPath
+$settings = Require-File $settingsPath
 $progress = Require-File $progressPath
 $scheme = Require-File $schemePath
 $sharedApi = Require-File $sharedApiPath
@@ -143,6 +145,12 @@ Add-Check "Workflow invokes build-shared via bash" $workflowInvokesBuildScriptSa
 $workflowInvokesGradleWrapperViaBash =
     $workflow -match [regex]::Escape("bash ./gradlew :shared:generateCommonMainWaterValveDbInterface :shared:compileKotlinJvm :shared:compileTestKotlinJvm :shared:jvmTest --no-daemon")
 Add-Check "Workflow invokes the Gradle wrapper via bash" $workflowInvokesGradleWrapperViaBash "GitHub Actions should call the root Gradle wrapper through bash so macOS runners do not fail on a missing executable bit."
+
+$settingsPreferOfficialReposOnCi =
+    $settings -match [regex]::Escape('System.getenv("GITHUB_ACTIONS") != "true"') -and
+    $settings -match [regex]::Escape("https://maven.aliyun.com/repository/gradle-plugin") -and
+    $settings -match [regex]::Escape("gradlePluginPortal()")
+Add-Check "Gradle settings skip China mirrors on GitHub Actions" $settingsPreferOfficialReposOnCi "GitHub Actions should resolve plugins from official repositories first to avoid stale mirror metadata for KSP and other Gradle plugins."
 
 $workflowPinsXcodeSetup =
     $workflow -match [regex]::Escape("uses: maxim-lobanov/setup-xcode@v1") -and

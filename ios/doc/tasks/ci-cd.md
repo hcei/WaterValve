@@ -1,7 +1,7 @@
 # ci-cd
 
 > Dependencies: `.github/workflows/ios-build.yml`, `ios/BuildPhases/validate-ios-static.ps1`, `ios/BuildPhases/build-shared.sh`, `ios/WaterValve.xcodeproj`
-> Current status: `workflow aligned with shared + Swift architecture; latest real macOS failure reproduced and patched locally; rerun pending`
+> Current status: `workflow aligned with shared + Swift architecture; latest real macOS failures reproduced and patched locally; rerun pending`
 
 ## Tasks
 
@@ -10,6 +10,7 @@
 - [x] Build the shared iOS framework from the workflow.
 - [x] Run iOS static validation as part of GitHub Actions.
 - [x] Keep the validation and shared-build scripts path-agnostic enough for macOS runners instead of depending on local Windows paths or executable bits.
+- [x] Resolve Gradle plugins from official repositories first on GitHub Actions to avoid stale mirror metadata.
 - [x] Keep the shared build script and Xcode configuration aligned for both Debug and Release framework output directories.
 - [x] Keep the shared Xcode scheme pointing at the native target used by `xcodebuild archive`.
 - [x] Pin Xcode selection explicitly in the workflow instead of relying on runner defaults.
@@ -25,6 +26,7 @@
 - The workflow disables signing for archive work and now publishes both Debug and Release shared framework artifacts.
 - A real PR run now exists at `actions/runs/27447771358`; it failed before Gradle execution because the macOS runner hit `./gradlew: Permission denied`.
 - The workflow and `build-shared.sh` now both invoke the Gradle wrapper through `bash`, and static validation explicitly checks that safety guard.
+- A follow-up PR run at `actions/runs/27455258304` reached Gradle resolution and failed resolving `com.google.devtools.ksp` from mirror metadata; CI now skips China mirrors so official Gradle Plugin Portal / Maven repositories can resolve plugin artifacts first.
 - Windows cannot run `xcodebuild`; final proof still requires GitHub Actions or a local macOS/Xcode machine.
 
 ## Done Criteria

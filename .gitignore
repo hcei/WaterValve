@@ -1,5 +1,6 @@
 # Gradle
 .gradle/
+.gradle-ci-sim/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 
