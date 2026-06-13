@@ -36,6 +36,7 @@ $buildScriptPath = Join-Path $root "BuildPhases\build-shared.sh"
 $sharedBuildBatPath = Join-Path $repoRoot "build_shared.bat"
 $workflowPath = Join-Path $repoRoot ".github\workflows\ios-build.yml"
 $settingsPath = Join-Path $repoRoot "settings.gradle.kts"
+$swiftPackagePath = Join-Path $root "Package.swift"
 $progressPath = Join-Path $root "doc\tasks\progress.md"
 $schemePath = Join-Path $root "WaterValve.xcodeproj\xcshareddata\xcschemes\WaterValve.xcscheme"
 $sharedApiPath = Join-Path $repoRoot "shared\src\commonMain\kotlin\com\hgu\watervalve\shared\data\remote\api\UwcApi.kt"
@@ -53,10 +54,14 @@ $valveViewPath = Join-Path $root "WaterValve\UI\Valve\ValveView.swift"
 $webViewPath = Join-Path $root "WaterValve\UI\WebView\WebViewScreen.swift"
 $bannedViewPath = Join-Path $root "WaterValve\UI\Common\BannedAlertView.swift"
 $backgroundPath = Join-Path $root "WaterValve\Background\BackgroundTaskManager.swift"
+$backgroundPolicyPath = Join-Path $root "WaterValve\Background\BackgroundRefreshPolicy.swift"
 $loginPath = Join-Path $root "WaterValve\UI\Login\LoginView.swift"
 $sharedProbePath = Join-Path $root "WaterValve\Core\SharedBridgeProbe.swift"
 $repositoriesPath = Join-Path $root "WaterValve\Core\Repositories.swift"
 $sharedAdaptersPath = Join-Path $root "WaterValve\Core\SharedAdapters.swift"
+$updateReleasePath = Join-Path $root "WaterValve\Update\UpdateRelease.swift"
+$updateReleaseParserPath = Join-Path $root "WaterValve\Update\UpdateReleaseParser.swift"
+$updateDecisionEnginePath = Join-Path $root "WaterValve\Update\UpdateDecisionEngine.swift"
 
 $project = Require-File $projectPath
 $plist = Require-File $plistPath
@@ -64,6 +69,7 @@ $buildScript = Require-File $buildScriptPath
 $sharedBuildBat = Require-File $sharedBuildBatPath
 $workflow = Require-File $workflowPath
 $settings = Require-File $settingsPath
+$swiftPackage = Require-File $swiftPackagePath
 $progress = Require-File $progressPath
 $scheme = Require-File $schemePath
 $sharedApi = Require-File $sharedApiPath
@@ -81,24 +87,33 @@ $valveView = Require-File $valveViewPath
 $webView = Require-File $webViewPath
 $bannedView = Require-File $bannedViewPath
 $background = Require-File $backgroundPath
+$backgroundPolicy = Require-File $backgroundPolicyPath
 $loginView = Require-File $loginPath
 $sharedProbe = Require-File $sharedProbePath
 $repositories = Require-File $repositoriesPath
 $sharedAdapters = Require-File $sharedAdaptersPath
+$updateRelease = Require-File $updateReleasePath
+$updateReleaseParser = Require-File $updateReleaseParserPath
+$updateDecisionEngine = Require-File $updateDecisionEnginePath
 
 $requiredFiles = @(
+    "Package.swift",
     "WaterValve\WaterValveApp.swift",
     "WaterValve\Navigation\AppNavigation.swift",
     "WaterValve\Core\AppContainer.swift",
     "WaterValve\Core\AppState.swift",
     "WaterValve\Core\SharedAdapters.swift",
     "WaterValve\Core\SharedBridgeProbe.swift",
+    "WaterValve\Background\BackgroundRefreshPolicy.swift",
     "WaterValve\UI\Login\LoginView.swift",
     "WaterValve\UI\Home\HomeView.swift",
     "WaterValve\UI\QRScanner\QRScannerView.swift",
     "WaterValve\UI\Valve\ValveView.swift",
     "WaterValve\UI\Record\RecordView.swift",
     "WaterValve\UI\WebView\WebViewScreen.swift",
+    "WaterValve\Update\UpdateRelease.swift",
+    "WaterValve\Update\UpdateReleaseParser.swift",
+    "WaterValve\Update\UpdateDecisionEngine.swift",
     "WaterValve\Update\UpdateAlertView.swift",
     "WaterValve\Background\BackgroundTaskManager.swift"
 )
@@ -111,7 +126,11 @@ foreach ($relativePath in $requiredFiles) {
 $projectHasActiveSwiftSources =
     $project -match [regex]::Escape("WaterValveApp.swift") -and
     $project -match [regex]::Escape("BackgroundTaskManager.swift") -and
+    $project -match [regex]::Escape("BackgroundRefreshPolicy.swift") -and
     $project -match [regex]::Escape("UpdateService.swift") -and
+    $project -match [regex]::Escape("UpdateRelease.swift") -and
+    $project -match [regex]::Escape("UpdateReleaseParser.swift") -and
+    $project -match [regex]::Escape("UpdateDecisionEngine.swift") -and
     $project -match [regex]::Escape("SharedAdapters.swift") -and
     $project -match [regex]::Escape("SharedBridgeProbe.swift")
 Add-Check "Xcode project includes the active Swift app sources" $projectHasActiveSwiftSources "project.pbxproj should keep the current Swift target source set wired in."
@@ -181,6 +200,11 @@ $workflowRunsSharedJvmTests =
     $workflow -match [regex]::Escape(":shared:jvmTest")
 Add-Check "Workflow runs shared JVM tests" $workflowRunsSharedJvmTests "GitHub Actions should execute shared JVM tests, not only compile them."
 
+$workflowRunsSwiftPackageTests =
+    $workflow -match [regex]::Escape("Run iOS logic tests") -and
+    $workflow -match [regex]::Escape("swift test --package-path ios")
+Add-Check "Workflow runs Swift package logic tests" $workflowRunsSwiftPackageTests "GitHub Actions should run the lightweight Swift package tests that cover the iOS update and background scheduling rules."
+
 $workflowPackagesUnsignedIpa =
     $workflow -match [regex]::Escape("Package unsigned IPA") -and
     $workflow -match [regex]::Escape("WaterValve-unsigned.ipa") -and
@@ -237,17 +261,26 @@ Add-Check "Background manager has re-entry protection" $backgroundHasReentryProt
 $backgroundRespectsSessionState =
     $background -match [regex]::Escape("func scheduleNextRefreshIfAuthorized()") -and
     $background -match [regex]::Escape("func cancelScheduledRefresh()") -and
-    $background -match [regex]::Escape("cancel(taskRequestWithIdentifier: refreshIdentifier)")
+    $background -match [regex]::Escape("cancel(taskRequestWithIdentifier: refreshIdentifier)") -and
+    $backgroundPolicy -match [regex]::Escape("shouldSchedule(hasAuthenticatedSession: Bool)") -and
+    $backgroundPolicy -match [regex]::Escape("earliestBeginDate(from now: Date = .now)")
 Add-Check "Background manager can gate and cancel refresh requests by session state" $backgroundRespectsSessionState "Background refresh scheduling should respect login state and support logout cleanup."
 
 $updateServiceAvoidsImpossibleForcedUpdate =
-    (Require-File (Join-Path $root "WaterValve\Update\UpdateService.swift")) -match [regex]::Escape("let shouldForce = requiresUpgrade && hasDirectInstallable")
+    $updateDecisionEngine -match [regex]::Escape("let shouldForce = requiresUpgrade && hasDirectInstallable")
 Add-Check "Update service avoids impossible forced updates for non-IPA releases" $updateServiceAvoidsImpossibleForcedUpdate "iOS should not hard-lock users on an Android-only release that has no IPA asset."
 
 $swiftUpdateRepositoryHandlesProxyShape =
-    $repositories -match [regex]::Escape('let releaseObject = (json["release"] as? [String: Any]) ?? json') -and
-    $repositories -match [regex]::Escape('?? releaseObject["downloadUrl"] as? String')
+    $updateReleaseParser -match [regex]::Escape('let releaseObject = (json["release"] as? [String: Any]) ?? json') -and
+    $updateReleaseParser -match [regex]::Escape('?? releaseObject["downloadUrl"] as? String') -and
+    $updateReleaseParser -match [regex]::Escape('return url.lowercased().hasSuffix(".ipa")')
 Add-Check "Swift update repository tolerates proxy-wrapped release payloads" $swiftUpdateRepositoryHandlesProxyShape "The iOS update parser should handle both GitHub-style top-level release payloads and proxy-wrapped release objects."
+
+$swiftPackageSeparatesUpdateLogic =
+    $swiftPackage -match [regex]::Escape('name: "WaterValveLogic"') -and
+    $swiftPackage -match [regex]::Escape('Update/UpdateDecisionEngine.swift') -and
+    $swiftPackage -match [regex]::Escape('Background/BackgroundRefreshPolicy.swift')
+Add-Check "Swift package exposes testable update and background logic" $swiftPackageSeparatesUpdateLogic "ios/Package.swift should surface the pure Swift update/background policy code so macOS CI can test it without a full app test target."
 
 $loginViewShowsStagedProgress =
     $loginView -match [regex]::Escape("@MainActor") -and

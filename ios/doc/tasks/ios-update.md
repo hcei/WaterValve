@@ -2,7 +2,7 @@
 
 > Dependencies: `ios-core`
 > Related requirement: `F9`
-> Current status: `implemented in app logic; release strategy still unverified`
+> Current status: `implemented in app logic with automated decision tests; release strategy still unverified`
 
 ## Tasks
 
@@ -16,12 +16,13 @@
 - [x] Surface update info through `AppState` and show `UpdateAlertView` from the root navigation layer.
 - [x] Remove the misleading direct-install implication from the update UI and explain that IPA delivery still needs manual AltStore/SideStore import.
 - [x] Prevent Android-only releases from becoming an unsatisfiable forced-update lock on iOS when no `.ipa` asset exists.
+- [x] Add automated tests for version comparison, metadata parsing, source fallback, and Android-only release handling.
 - [ ] Verify the actual release distribution path the project wants for iOS, because current public release metadata may still be Android-first.
 - [ ] Validate the full update UX on a real iPhone.
 
 ## Notes
 
-- The update checker exists, but operational success depends on whether releases actually publish iOS-ready assets and whether the team accepts manual IPA distribution.
+- The update checker exists and its pure decision logic now has automated coverage, but operational success still depends on whether releases actually publish iOS-ready assets and whether the team accepts manual IPA distribution.
 - As of 2026-06-13, the public `v1.1.2` release exposed by GitHub and the PythonAnywhere proxy is still Android-only (`.apk`), so the iOS client now downgrades forced-update behavior unless an `.ipa` asset is actually present.
 - This should not be marked fully complete until the release channel itself is confirmed, not just the parsing logic.
 

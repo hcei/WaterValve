@@ -6,7 +6,11 @@ enum APIClientError: Error {
     case decodingFailed
 }
 
-final class APIClient {
+protocol JSONClient {
+    func getJSON(from url: URL) async throws -> Any
+}
+
+final class APIClient: JSONClient {
     func getJSON(from url: URL) async throws -> Any {
         let (data, response) = try await URLSession.shared.data(from: url)
         guard let http = response as? HTTPURLResponse else { throw APIClientError.invalidResponse }

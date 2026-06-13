@@ -8,8 +8,7 @@ final class AppContainer: ObservableObject {
     let sharedBridge = IosSharedBridge()
     lazy var authRepository = AuthRepository(container: self)
     lazy var deviceRepository = DeviceRepository(container: self)
-    lazy var updateRepository = UpdateRepository()
-    lazy var updateService = UpdateService(client: client, updateRepository: updateRepository)
+    lazy var updateService = UpdateService(client: client)
     lazy var backgroundTaskManager = BackgroundTaskManager(authRepository: authRepository)
 
     private var didBootstrap = false

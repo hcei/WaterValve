@@ -10,8 +10,8 @@
 | KMP shared layer | Implemented and validated in GitHub Actions, including shared iOS framework builds on macOS | Source review plus local JVM compile/test, including `:shared:jvmTest`, and successful GitHub Actions shared iOS framework + archive execution |
 | Swift iOS app structure | Implemented with minimal shared-framework consumption probe | Static file/project review plus Xcode wiring checks |
 | Login / WebView / Valve / Home / Record flows | Implemented | Static code review only |
-| Background refresh wiring | Implemented, unverified | Code and plist present; no runtime proof |
-| Update flow | Implemented in app logic; CI now produces unsigned IPA artifacts, but public release-channel adoption still remains unverified | Parsing/UI logic, live release metadata review, and CI artifact packaging proof; public tagged releases still need an actual iOS asset publish cycle |
+| Background refresh wiring | Implemented with logic-level tests; runtime unverified | Code, plist, and pure scheduling-policy tests exist; no real BGTask runtime proof yet |
+| Update flow | Implemented in app logic with automated decision tests; CI now produces unsigned IPA artifacts, but public release-channel adoption still remains unverified | Parsing/UI logic, Swift package tests, live release metadata review, and CI artifact packaging proof; public tagged releases still need an actual iOS asset publish cycle |
 | GitHub Actions iOS workflow | Implemented and validated on GitHub-hosted macOS runners | Successful GitHub Actions run `27464132330`, including shared validation, shared iOS framework builds, static validation, and app archive |
 
 ## Completion Summary

@@ -11,14 +11,6 @@ struct UserSession: Codable, Equatable {
     var sessionCookie: String
 }
 
-struct UpdateRelease: Codable, Equatable {
-    let tagName: String
-    let body: String
-    let assetDownloadURL: String?
-    let releasePageURL: String?
-    let assetName: String?
-}
-
 struct SyncDevicePayload: Codable, Equatable {
     let id: String
     let name: String

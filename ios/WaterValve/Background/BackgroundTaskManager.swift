@@ -36,13 +36,16 @@ final class BackgroundTaskManager {
     }
 
     func scheduleNextRefreshIfAuthorized() {
-        guard authRepository?.currentSession() != nil else { return }
+        let hasAuthenticatedSession = authRepository?.currentSession() != nil
+        guard BackgroundRefreshPolicy.shouldSchedule(hasAuthenticatedSession: hasAuthenticatedSession) else {
+            return
+        }
         scheduleNextRefresh()
     }
 
     func scheduleNextRefresh() {
         let request = BGAppRefreshTaskRequest(identifier: refreshIdentifier)
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 12 * 60 * 60)
+        request.earliestBeginDate = BackgroundRefreshPolicy.earliestBeginDate()
         BGTaskScheduler.shared.cancel(taskRequestWithIdentifier: refreshIdentifier)
         try? BGTaskScheduler.shared.submit(request)
     }

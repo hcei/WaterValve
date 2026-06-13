@@ -32,6 +32,10 @@
 		4F03D8852CFA010100000017 /* SessionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000018 /* SessionModels.swift */; };
 		4F03D8852CFA010100000018 /* SharedBridgeProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000019 /* SharedBridgeProbe.swift */; };
 		4F03D8852CFA010100000019 /* SharedAdapters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA10010000001A /* SharedAdapters.swift */; };
+		4F03D8852CFA010100000020 /* BackgroundRefreshPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000020 /* BackgroundRefreshPolicy.swift */; };
+		4F03D8852CFA010100000021 /* UpdateRelease.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000021 /* UpdateRelease.swift */; };
+		4F03D8852CFA010100000022 /* UpdateReleaseParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000022 /* UpdateReleaseParser.swift */; };
+		4F03D8852CFA010100000023 /* UpdateDecisionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000023 /* UpdateDecisionEngine.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,6 +66,10 @@
 		4F03D8852CFA100100000018 /* SessionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionModels.swift; sourceTree = "<group>"; };
 		4F03D8852CFA100100000019 /* SharedBridgeProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedBridgeProbe.swift; sourceTree = "<group>"; };
 		4F03D8852CFA10010000001A /* SharedAdapters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedAdapters.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000020 /* BackgroundRefreshPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundRefreshPolicy.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000021 /* UpdateRelease.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateRelease.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000022 /* UpdateReleaseParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateReleaseParser.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000023 /* UpdateDecisionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateDecisionEngine.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -173,6 +181,7 @@
 			sourceTree = "<group>";
 			children = (
 				4F03D8852CFA10010000000C /* BackgroundTaskManager.swift */,
+				4F03D8852CFA100100000020 /* BackgroundRefreshPolicy.swift */,
 			);
 		};
 		4F03D8852CFA00010000000A /* Update */ = {
@@ -181,6 +190,9 @@
 			sourceTree = "<group>";
 			children = (
 				4F03D8852CFA10010000000D /* UpdateInfo.swift */,
+				4F03D8852CFA100100000021 /* UpdateRelease.swift */,
+				4F03D8852CFA100100000022 /* UpdateReleaseParser.swift */,
+				4F03D8852CFA100100000023 /* UpdateDecisionEngine.swift */,
 				4F03D8852CFA10010000000E /* UpdateService.swift */,
 				4F03D8852CFA10010000000F /* UpdateAlertView.swift */,
 			);
@@ -323,7 +335,11 @@
 				4F03D8852CFA01010000000A /* RecordView.swift in Sources */,
 				4F03D8852CFA01010000000B /* WebViewScreen.swift in Sources */,
 				4F03D8852CFA01010000000C /* BackgroundTaskManager.swift in Sources */,
+				4F03D8852CFA010100000020 /* BackgroundRefreshPolicy.swift in Sources */,
 				4F03D8852CFA01010000000D /* UpdateInfo.swift in Sources */,
+				4F03D8852CFA010100000021 /* UpdateRelease.swift in Sources */,
+				4F03D8852CFA010100000022 /* UpdateReleaseParser.swift in Sources */,
+				4F03D8852CFA010100000023 /* UpdateDecisionEngine.swift in Sources */,
 				4F03D8852CFA01010000000E /* UpdateService.swift in Sources */,
 				4F03D8852CFA01010000000F /* UpdateAlertView.swift in Sources */,
 				4F03D8852CFA010100000011 /* AppConstants.swift in Sources */,

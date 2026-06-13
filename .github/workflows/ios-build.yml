@@ -40,6 +40,9 @@ jobs:
       - name: Build shared iOS framework
         run: bash ./ios/BuildPhases/build-shared.sh
 
+      - name: Run iOS logic tests
+        run: swift test --package-path ios
+
       - name: Show Xcode version
         run: xcodebuild -version
 

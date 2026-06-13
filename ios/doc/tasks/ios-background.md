@@ -2,7 +2,7 @@
 
 > Dependencies: `ios-core`
 > Related requirement: `F7`
-> Current status: `implemented in code and plist; runtime unverified`
+> Current status: `implemented in code and plist; scheduling policy has automated tests, runtime still unverified`
 
 ## Tasks
 
@@ -17,11 +17,12 @@
 - [x] Cancel pending background refresh requests on logout so stale token jobs do not linger.
 - [x] Add `BGTaskSchedulerPermittedIdentifiers` to `Info.plist`.
 - [x] Add `UIBackgroundModes` entries needed for refresh and processing.
+- [x] Add automated tests for the session-gated scheduling policy and 12-hour refresh interval.
 - [ ] Verify actual task scheduling and execution in Xcode or on a real iPhone.
 
 ## Notes
 
-- This item is complete only at the static code/config level.
+- This item is complete at the code/config and pure-logic test level.
 - Background execution behavior cannot be confirmed from Windows; it still requires Xcode diagnostics or device testing on macOS.
 
 ## Done Criteria
