@@ -100,6 +100,11 @@ class AuthRepository(
         userDefaults.setBool(Constants.UD_KEY_IS_BANNED, true)
     }
 
+    fun clearBanned() {
+        mutableIsBanned.value = false
+        userDefaults.setBool(Constants.UD_KEY_IS_BANNED, false)
+    }
+
     fun clearAuth() {
         keychain.clear()
         userDefaults.remove(Constants.UD_KEY_NICKNAME)

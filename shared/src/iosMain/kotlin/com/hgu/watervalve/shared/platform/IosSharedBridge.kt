@@ -72,7 +72,7 @@ class IosSharedBridge {
     fun currentBannedState(): Boolean = authRepository.isBanned.value as? Boolean ?: false
 
     fun clearBannedState() {
-        userDefaults.setBool(com.hgu.watervalve.shared.util.Constants.UD_KEY_IS_BANNED, false)
+        authRepository.clearBanned()
     }
 
     fun currentLoginState(): IosLoginStateSnapshot {
