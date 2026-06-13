@@ -1,2 +1,3 @@
+language = Objective-C
 modules = CommonCrypto
 package = com.hgu.watervalve.shared.nativecrypto
