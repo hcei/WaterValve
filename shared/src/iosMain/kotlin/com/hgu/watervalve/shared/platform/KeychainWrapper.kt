@@ -1,17 +1,18 @@
+@file:Suppress("CAST_NEVER_SUCCEEDS")
+
 package com.hgu.watervalve.shared.platform
 
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
-import platform.CoreFoundation.CFBridgingRelease
-import platform.CoreFoundation.CFBridgingRetain
-import platform.CoreFoundation.CFDictionaryAddValue
-import platform.CoreFoundation.CFDictionaryCreateMutable
-import platform.CoreFoundation.CFMutableDictionaryRef
-import platform.CoreFoundation.CFTypeRef
+import kotlinx.cinterop.ptr
+import platform.CoreFoundation.CFDictionaryRef
 import platform.CoreFoundation.CFTypeRefVar
 import platform.CoreFoundation.kCFBooleanTrue
+import platform.Foundation.CFBridgingRelease
 import platform.Foundation.NSData
+import platform.Foundation.NSDictionary
 import platform.Foundation.NSString
 import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.create
@@ -31,20 +32,19 @@ import platform.Security.kSecMatchLimit
 import platform.Security.kSecMatchLimitOne
 import platform.Security.kSecReturnData
 import platform.Security.kSecValueData
-import kotlinx.cinterop.CValuesRef
 
-@OptIn(ExperimentalForeignApi::class)
+@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 actual class KeychainWrapper actual constructor() {
     private val serviceName = "com.hgu.watervalve"
 
     actual fun set(key: String, value: String): Boolean {
         delete(key)
         val data = (value as NSString).dataUsingEncoding(NSUTF8StringEncoding) ?: return false
-        val query = query(
+        val query = buildQuery(
             kSecClass to kSecClassGenericPassword,
-            kSecAttrService to serviceName.toCFType(),
-            kSecAttrAccount to key.toCFType(),
-            kSecValueData to data.toCFType(),
+            kSecAttrService to serviceName,
+            kSecAttrAccount to key,
+            kSecValueData to data,
             kSecAttrAccessible to kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
         )
         val status = SecItemAdd(query, null)
@@ -52,10 +52,10 @@ actual class KeychainWrapper actual constructor() {
     }
 
     actual fun get(key: String): String? = memScoped {
-        val query = query(
+        val query = buildQuery(
             kSecClass to kSecClassGenericPassword,
-            kSecAttrService to serviceName.toCFType(),
-            kSecAttrAccount to key.toCFType(),
+            kSecAttrService to serviceName,
+            kSecAttrAccount to key,
             kSecReturnData to kCFBooleanTrue,
             kSecMatchLimit to kSecMatchLimitOne,
         )
@@ -69,33 +69,27 @@ actual class KeychainWrapper actual constructor() {
     }
 
     actual fun delete(key: String): Boolean {
-        val query = query(
+        val query = buildQuery(
             kSecClass to kSecClassGenericPassword,
-            kSecAttrService to serviceName.toCFType(),
-            kSecAttrAccount to key.toCFType(),
+            kSecAttrService to serviceName,
+            kSecAttrAccount to key,
         )
         val status = SecItemDelete(query)
         return status == errSecSuccess || status == errSecItemNotFound
     }
 
     actual fun clear(): Boolean {
-        val query = query(
+        val query = buildQuery(
             kSecClass to kSecClassGenericPassword,
-            kSecAttrService to serviceName.toCFType(),
+            kSecAttrService to serviceName,
         )
         val status = SecItemDelete(query)
         return status == errSecSuccess || status == errSecItemNotFound
     }
 
-    private fun query(vararg pairs: Pair<CValuesRef<*>?, CValuesRef<*>?>): CFMutableDictionaryRef? {
-        val dictionary = CFDictionaryCreateMutable(null, pairs.size.toLong(), null, null)
-        pairs.forEach { (key, value) ->
-            CFDictionaryAddValue(dictionary, key, value)
-        }
-        return dictionary
+    private fun buildQuery(vararg pairs: Pair<Any?, Any?>): CFDictionaryRef? {
+        val keys = pairs.map { it.first }
+        val values = pairs.map { it.second }
+        return NSDictionary.dictionaryWithObjects(objects = values, forKeys = keys) as CFDictionaryRef
     }
-
-    private fun String.toCFType(): CFTypeRef? = CFBridgingRetain(this as NSString)
-
-    private fun NSData.toCFType(): CFTypeRef? = CFBridgingRetain(this)
 }
