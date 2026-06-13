@@ -62,10 +62,26 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY=""
 
+      - name: Package unsigned IPA
+        run: |
+          APP_PATH="$RUNNER_TEMP/WaterValve.xcarchive/Products/Applications/WaterValve.app"
+          PAYLOAD_DIR="$RUNNER_TEMP/Payload"
+          mkdir -p "$PAYLOAD_DIR"
+          cp -R "$APP_PATH" "$PAYLOAD_DIR/WaterValve.app"
+          cd "$RUNNER_TEMP"
+          ditto -c -k --sequesterRsrc --keepParent Payload WaterValve-unsigned.ipa
+
       - name: Package archive
         run: |
           cd "$RUNNER_TEMP"
           ditto -c -k --sequesterRsrc --keepParent WaterValve.xcarchive WaterValve-xcarchive.zip
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WaterValve-ios-unsigned-ipa
+          path: ${{ runner.temp }}/WaterValve-unsigned.ipa
+          retention-days: 30
 
       - name: Upload archive artifact
         uses: actions/upload-artifact@v4
@@ -98,4 +114,6 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ runner.temp }}/WaterValve-xcarchive.zip
+          files: |
+            ${{ runner.temp }}/WaterValve-unsigned.ipa
+            ${{ runner.temp }}/WaterValve-xcarchive.zip

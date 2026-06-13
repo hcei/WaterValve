@@ -181,6 +181,12 @@ $workflowRunsSharedJvmTests =
     $workflow -match [regex]::Escape(":shared:jvmTest")
 Add-Check "Workflow runs shared JVM tests" $workflowRunsSharedJvmTests "GitHub Actions should execute shared JVM tests, not only compile them."
 
+$workflowPackagesUnsignedIpa =
+    $workflow -match [regex]::Escape("Package unsigned IPA") -and
+    $workflow -match [regex]::Escape("WaterValve-unsigned.ipa") -and
+    $workflow -match [regex]::Escape("Upload IPA artifact")
+Add-Check "Workflow packages and uploads an unsigned IPA artifact" $workflowPackagesUnsignedIpa "GitHub Actions should export an unsigned IPA artifact in addition to the xcarchive so the AltStore/SideStore release flow matches the project requirements."
+
 $hasCameraUsageDescription =
     $plist -match [regex]::Escape("NSCameraUsageDescription")
 Add-Check "Info.plist keeps camera usage description" $hasCameraUsageDescription "Camera permission text is required for QR scanning."

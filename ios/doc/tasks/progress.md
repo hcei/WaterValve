@@ -11,7 +11,7 @@
 | Swift iOS app structure | Implemented with minimal shared-framework consumption probe | Static file/project review plus Xcode wiring checks |
 | Login / WebView / Valve / Home / Record flows | Implemented | Static code review only |
 | Background refresh wiring | Implemented, unverified | Code and plist present; no runtime proof |
-| Update flow | Implemented; Android-only release mismatch mitigated, final iOS release path still unverified | Parsing/UI logic plus live release metadata review; distribution still needs confirmation |
+| Update flow | Implemented in app logic; CI now produces unsigned IPA artifacts, but public release-channel adoption still remains unverified | Parsing/UI logic, live release metadata review, and CI artifact packaging proof; public tagged releases still need an actual iOS asset publish cycle |
 | GitHub Actions iOS workflow | Implemented and validated on GitHub-hosted macOS runners | Successful GitHub Actions run `27464132330`, including shared validation, shared iOS framework builds, static validation, and app archive |
 
 ## Completion Summary
@@ -55,5 +55,6 @@
 - The Swift iOS target now has a minimal `import Shared` probe plus framework search/link settings, but the app's runtime business logic is still primarily implemented in Swift.
 - `ios/WaterValve.xcodeproj` now keeps `ios/BuildPhases/build-shared.sh` as an active shell phase, aligns its shared scheme to the native target, uses framework paths that match actual KMP output directories, and links `-lsqlite3` so SQLDelight symbols resolve during archive.
 - Real GitHub Actions PR runs exposed a macOS `./gradlew` permission failure, then a KSP plugin mirror-resolution failure, and finally a missing SQLite linkage during archive; the workflow/shared build script now invoke Gradle through `bash`, CI skips China mirrors for official plugin resolution, the Xcode target links `libsqlite3`, and the static validator covers these guards.
-- `ios-background` and `ios-update` remain unchecked because they still need runtime validation outside this Windows environment.
+- `ios-background` remains unchecked because it still needs runtime validation outside this Windows environment.
+- `ios-update` remains unchecked because the client logic and CI packaging are in place, but the public release channel still needs a real tagged IPA publish/consume cycle.
 - Windows cannot run `swift` or `xcodebuild` here, so all compile, archive, background-task, and live WebView conclusions remain limited to static review unless confirmed on macOS.
