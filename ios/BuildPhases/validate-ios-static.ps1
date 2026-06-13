@@ -41,8 +41,12 @@ $schemePath = Join-Path $root "WaterValve.xcodeproj\xcshareddata\xcschemes\Water
 $sharedApiPath = Join-Path $repoRoot "shared\src\commonMain\kotlin\com\hgu\watervalve\shared\data\remote\api\UwcApi.kt"
 $sharedSyncPath = Join-Path $repoRoot "shared\src\commonMain\kotlin\com\hgu\watervalve\shared\data\remote\api\SyncApi.kt"
 $sharedReleasePath = Join-Path $repoRoot "shared\src\commonMain\kotlin\com\hgu\watervalve\shared\data\remote\api\ReleaseApi.kt"
+$sharedCryptoPath = Join-Path $repoRoot "shared\src\commonMain\kotlin\com\hgu\watervalve\shared\data\remote\crypto\UwcCrypto.kt"
 $sharedAuthRepoPath = Join-Path $repoRoot "shared\src\commonMain\kotlin\com\hgu\watervalve\shared\data\repository\AuthRepository.kt"
 $sharedDeviceRepoPath = Join-Path $repoRoot "shared\src\commonMain\kotlin\com\hgu\watervalve\shared\data\repository\DeviceRepository.kt"
+$sharedIosKeychainPath = Join-Path $repoRoot "shared\src\iosMain\kotlin\com\hgu\watervalve\shared\platform\KeychainWrapper.kt"
+$sharedIosClockPath = Join-Path $repoRoot "shared\src\iosMain\kotlin\com\hgu\watervalve\shared\platform\PlatformClock.kt"
+$sharedIosDefaultsPath = Join-Path $repoRoot "shared\src\iosMain\kotlin\com\hgu\watervalve\shared\platform\UserDefaultsWrapper.kt"
 $homeViewPath = Join-Path $root "WaterValve\UI\Home\HomeView.swift"
 $valveViewPath = Join-Path $root "WaterValve\UI\Valve\ValveView.swift"
 $webViewPath = Join-Path $root "WaterValve\UI\WebView\WebViewScreen.swift"
@@ -62,8 +66,12 @@ $scheme = Require-File $schemePath
 $sharedApi = Require-File $sharedApiPath
 $sharedSync = Require-File $sharedSyncPath
 $sharedRelease = Require-File $sharedReleasePath
+$sharedCrypto = Require-File $sharedCryptoPath
 $sharedAuthRepo = Require-File $sharedAuthRepoPath
 $sharedDeviceRepo = Require-File $sharedDeviceRepoPath
+$sharedIosKeychain = Require-File $sharedIosKeychainPath
+$sharedIosClock = Require-File $sharedIosClockPath
+$sharedIosDefaults = Require-File $sharedIosDefaultsPath
 $homeView = Require-File $homeViewPath
 $valveView = Require-File $valveViewPath
 $webView = Require-File $webViewPath
@@ -242,6 +250,20 @@ $sharedModulesExist =
     $sharedAuthRepo -match [regex]::Escape("class AuthRepository") -and
     $sharedDeviceRepo -match [regex]::Escape("class DeviceRepository")
 Add-Check "Shared API and repository modules exist" $sharedModulesExist "The KMP shared layer should define API and repository classes under shared/commonMain."
+
+$sharedCryptoAvoidsJvmOnlyApis =
+    $sharedCrypto -notmatch [regex]::Escape("toSortedMap()") -and
+    $sharedCrypto -notmatch [regex]::Escape("Integer.rotateLeft") -and
+    $sharedCrypto -notmatch [regex]::Escape('"%02x".format(')
+Add-Check "Shared crypto avoids JVM-only helpers in commonMain" $sharedCryptoAvoidsJvmOnlyApis "Kotlin/Native builds should not depend on JVM-only APIs such as toSortedMap, Integer.rotateLeft, or String.format in commonMain crypto code."
+
+$sharedIosPlatformUsesNativeSafeApis =
+    $sharedIosKeychain -match [regex]::Escape("@OptIn(ExperimentalForeignApi::class)") -and
+    $sharedIosKeychain -match [regex]::Escape("CFTypeRefVar") -and
+    $sharedIosClock -match [regex]::Escape("gettimeofday") -and
+    $sharedIosDefaults -match [regex]::Escape("objectForKey") -and
+    $sharedIosDefaults -notmatch [regex]::Escape("stringForKey")
+Add-Check "Shared iosMain platform wrappers use Kotlin/Native-safe interop" $sharedIosPlatformUsesNativeSafeApis "The iosMain keychain, clock, and defaults wrappers should use Kotlin/Native-safe Foundation/Security interop patterns."
 
 $total = $checks.Count
 $passed = ($checks | Where-Object { $_.Passed }).Count

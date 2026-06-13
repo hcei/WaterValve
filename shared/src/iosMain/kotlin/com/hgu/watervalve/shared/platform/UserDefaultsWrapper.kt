@@ -1,8 +1,6 @@
 package com.hgu.watervalve.shared.platform
 
 import platform.Foundation.NSUserDefaults
-import platform.Foundation.stringForKey
-
 actual class UserDefaultsWrapper actual constructor() {
     private val defaults = NSUserDefaults.standardUserDefaults
 
@@ -11,7 +9,7 @@ actual class UserDefaultsWrapper actual constructor() {
         defaults.synchronize()
     }
 
-    actual fun getString(key: String): String? = defaults.stringForKey(key)
+    actual fun getString(key: String): String? = defaults.objectForKey(key) as? String
 
     actual fun setBool(key: String, value: Boolean) {
         defaults.setBool(value, forKey = key)

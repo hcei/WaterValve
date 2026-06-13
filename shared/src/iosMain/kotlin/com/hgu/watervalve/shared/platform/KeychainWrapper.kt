@@ -1,9 +1,10 @@
 package com.hgu.watervalve.shared.platform
 
-import kotlinx.cinterop.COpaquePointerVar
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
 import platform.CoreFoundation.CFDictionaryRef
+import platform.CoreFoundation.CFTypeRefVar
 import platform.Foundation.NSData
 import platform.Foundation.NSString
 import platform.Foundation.NSUTF8StringEncoding
@@ -25,6 +26,7 @@ import platform.Security.kSecMatchLimitOne
 import platform.Security.kSecReturnData
 import platform.Security.kSecValueData
 
+@OptIn(ExperimentalForeignApi::class)
 actual class KeychainWrapper actual constructor() {
     private val serviceName = "com.hgu.watervalve"
 
@@ -50,7 +52,7 @@ actual class KeychainWrapper actual constructor() {
             kSecReturnData to true,
             kSecMatchLimit to kSecMatchLimitOne,
         )
-        val result = alloc<COpaquePointerVar>()
+        val result = alloc<CFTypeRefVar>()
         val status = SecItemCopyMatching(query as CFDictionaryRef, result.ptr)
         if (status != errSecSuccess) return null
         val data = result.value as? NSData ?: return null

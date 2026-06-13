@@ -42,7 +42,9 @@ object UwcCrypto {
     }
 
     fun sign(params: Map<String, Any?>): String {
-        val concat = params.toSortedMap().entries.joinToString("&") { (key, value) -> "$key=${value ?: ""}" }
+        val concat = params.entries
+            .sortedBy { it.key }
+            .joinToString("&") { entry -> "${entry.key}=${entry.value ?: ""}" }
         return encodeBase64(md5(concat).encodeToByteArray())
     }
 
@@ -54,7 +56,9 @@ object UwcCrypto {
         withMerchant["sign"] = signValue
 
         val payload = buildJsonObject {
-            withMerchant.toSortedMap().forEach { (key, value) ->
+            withMerchant.entries.sortedBy { it.key }.forEach { entry ->
+                val key = entry.key
+                val value = entry.value
                 put(
                     key,
                     when (value) {
@@ -408,7 +412,7 @@ object UwcCrypto {
                 val temp = dd
                 dd = cc
                 cc = bb
-                bb += Integer.rotateLeft(aa + f + MD5_K[i] + m[g], MD5_S[i])
+                bb += rotateLeft(aa + f + MD5_K[i] + m[g], MD5_S[i])
                 aa = temp
             }
 
@@ -442,7 +446,7 @@ object UwcCrypto {
         bytes[1] = ((value ushr 8) and 0xFF).toByte()
         bytes[2] = ((value ushr 16) and 0xFF).toByte()
         bytes[3] = ((value ushr 24) and 0xFF).toByte()
-        return bytes.joinToString("") { "%02x".format(it) }
+        return bytes.joinToString("") { it.toHexByte() }
     }
 
     private val SHA512_K = longArrayOf(
@@ -568,7 +572,16 @@ object UwcCrypto {
         val iKeyPad = ByteArray(blockSize) { i -> (key[i].toInt() xor 0x36).toByte() }
         val inner = sha512(iKeyPad + data)
         val outer = sha512(oKeyPad + inner)
-        return outer.joinToString("") { "%02x".format(it) }
+        return outer.joinToString("") { it.toHexByte() }
+    }
+
+    private fun rotateLeft(value: Int, bits: Int): Int {
+        val normalizedBits = bits and 31
+        return (value shl normalizedBits) or (value ushr (32 - normalizedBits))
+    }
+
+    private fun Byte.toHexByte(): String {
+        return (toInt() and 0xFF).toString(16).padStart(2, '0')
     }
 
     private fun jsonObjectToValueMap(source: JsonObject): Map<String, Any?> {

@@ -7,7 +7,7 @@
 
 | Area | Status | Basis |
 |------|------|------|
-| KMP shared layer | Implemented for JVM validation; iOS framework output wired into Xcode/CI but still unverified on macOS | Source review plus local JVM compile/test, including `:shared:jvmTest` |
+| KMP shared layer | Implemented for JVM validation; iOS framework tasks also pass under local CI-style simulation, but real macOS proof is still pending | Source review plus local JVM compile/test, including `:shared:jvmTest`, and local `GITHUB_ACTIONS=true` shared iOS framework task simulation |
 | Swift iOS app structure | Implemented with minimal shared-framework consumption probe | Static file/project review plus Xcode wiring checks |
 | Login / WebView / Valve / Home / Record flows | Implemented | Static code review only |
 | Background refresh wiring | Implemented, unverified | Code and plist present; no runtime proof |
@@ -51,7 +51,7 @@
 ## Notes
 
 - The current iOS app under `ios/WaterValve/**` is implemented locally in Swift and should be evaluated on that basis.
-- The repository also now contains a concrete `shared/` KMP layer that compiles and tests on JVM and is included in CI validation.
+- The repository also now contains a concrete `shared/` KMP layer that compiles and tests on JVM, passes local `GITHUB_ACTIONS=true` iOS framework task simulation, and is included in CI validation.
 - The Swift iOS target now has a minimal `import Shared` probe plus framework search/link settings, but the app's runtime business logic is still primarily implemented in Swift.
 - `ios/WaterValve.xcodeproj` now keeps `ios/BuildPhases/build-shared.sh` as an active shell phase, aligns its shared scheme to the native target, and uses framework paths that match actual KMP output directories.
 - Real GitHub Actions PR runs exposed a macOS `./gradlew` permission failure and then a KSP plugin mirror-resolution failure; the workflow/shared build script now invoke Gradle through `bash`, CI skips China mirrors for official plugin resolution, and the static validator covers these guards.
