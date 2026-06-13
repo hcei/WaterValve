@@ -27,7 +27,7 @@ enum SharedBridgeError: LocalizedError {
 }
 
 extension Device {
-    init(shared: SharedIosDeviceSnapshot) {
+    init(shared: IosDeviceSnapshot) {
         self.init(
             id: shared.id,
             name: shared.name,
@@ -39,7 +39,7 @@ extension Device {
 }
 
 extension WaterRecord {
-    init(shared: SharedIosWaterRecordSnapshot) {
+    init(shared: IosWaterRecordSnapshot) {
         self.init(
             id: UUID(uuidString: stableUUIDString(id: shared.id, deviceName: shared.deviceName, timestamp: shared.timestamp)) ?? UUID(),
             deviceName: shared.deviceName,
@@ -62,7 +62,7 @@ extension WaterRecord {
 }
 
 extension UserSession {
-    init(sharedUserInfo: SharedUserInfo, snapshot: SharedSessionSnapshot) {
+    init(sharedUserInfo: UserInfo, snapshot: SharedSessionSnapshot) {
         self.init(
             userId: sharedUserInfo.userId,
             nickname: sharedUserInfo.nickname,
@@ -77,7 +77,7 @@ extension UserSession {
 }
 
 extension LoginConfig {
-    init(shared: SharedCasLoginConfig) {
+    init(shared: CasLoginConfig) {
         self.init(
             url: URL(string: shared.url)!,
             userAgent: shared.userAgent
@@ -86,7 +86,7 @@ extension LoginConfig {
 }
 
 extension UpdateRelease {
-    init(shared: SharedIosAppReleaseSnapshot) {
+    init(shared: IosAppReleaseSnapshot) {
         self.init(
             tagName: shared.tagName,
             body: shared.body,
@@ -107,7 +107,7 @@ func sharedErrorMessage(_ error: NSError) -> String {
     return "Unknown shared-layer error."
 }
 
-func loginErrorMessage(_ error: SharedLoginError) -> String {
+func loginErrorMessage(_ error: LoginError) -> String {
     let rawValue = String(describing: error).lowercased()
 
     if rawValue.contains("invalidcredentials") {

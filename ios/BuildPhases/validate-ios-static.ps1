@@ -55,6 +55,8 @@ $bannedViewPath = Join-Path $root "WaterValve\UI\Common\BannedAlertView.swift"
 $backgroundPath = Join-Path $root "WaterValve\Background\BackgroundTaskManager.swift"
 $loginPath = Join-Path $root "WaterValve\UI\Login\LoginView.swift"
 $sharedProbePath = Join-Path $root "WaterValve\Core\SharedBridgeProbe.swift"
+$repositoriesPath = Join-Path $root "WaterValve\Core\Repositories.swift"
+$sharedAdaptersPath = Join-Path $root "WaterValve\Core\SharedAdapters.swift"
 
 $project = Require-File $projectPath
 $plist = Require-File $plistPath
@@ -81,6 +83,8 @@ $bannedView = Require-File $bannedViewPath
 $background = Require-File $backgroundPath
 $loginView = Require-File $loginPath
 $sharedProbe = Require-File $sharedProbePath
+$repositories = Require-File $repositoriesPath
+$sharedAdapters = Require-File $sharedAdaptersPath
 
 $requiredFiles = @(
     "WaterValve\WaterValveApp.swift",
@@ -231,8 +235,8 @@ $updateServiceAvoidsImpossibleForcedUpdate =
 Add-Check "Update service avoids impossible forced updates for non-IPA releases" $updateServiceAvoidsImpossibleForcedUpdate "iOS should not hard-lock users on an Android-only release that has no IPA asset."
 
 $swiftUpdateRepositoryHandlesProxyShape =
-    (Require-File (Join-Path $root "WaterValve\Core\Repositories.swift")) -match [regex]::Escape('let releaseObject = (json["release"] as? [String: Any]) ?? json') -and
-    (Require-File (Join-Path $root "WaterValve\Core\Repositories.swift")) -match [regex]::Escape('?? releaseObject["downloadUrl"] as? String')
+    $repositories -match [regex]::Escape('let releaseObject = (json["release"] as? [String: Any]) ?? json') -and
+    $repositories -match [regex]::Escape('?? releaseObject["downloadUrl"] as? String')
 Add-Check "Swift update repository tolerates proxy-wrapped release payloads" $swiftUpdateRepositoryHandlesProxyShape "The iOS update parser should handle both GitHub-style top-level release payloads and proxy-wrapped release objects."
 
 $loginViewShowsStagedProgress =
@@ -240,6 +244,27 @@ $loginViewShowsStagedProgress =
     $loginView -match [regex]::Escape("exchangeCasTicket(ticket: ticket)") -and
     $loginView -match [regex]::Escape("uiState = .loading(step: step, message: message)")
 Add-Check "Login view model exposes staged progress through native exchange" $loginViewShowsStagedProgress "Login flow should surface staged native progress updates."
+
+$swiftBridgeUsesSwiftVisibleSharedNames =
+    $repositories -cmatch [regex]::Escape("LoginResult.Success") -and
+    $repositories -cmatch [regex]::Escape("LoginResult.Failed") -and
+    $repositories -cmatch [regex]::Escape("IosDeviceSnapshot") -and
+    $repositories -cnotmatch [regex]::Escape("SharedLoginResultSuccess") -and
+    $repositories -cnotmatch [regex]::Escape("SharedLoginResultFailed") -and
+    $repositories -cnotmatch [regex]::Escape("SharedIosDeviceSnapshot") -and
+    $sharedAdapters -cmatch [regex]::Escape("init(shared: IosDeviceSnapshot)") -and
+    $sharedAdapters -cmatch [regex]::Escape("init(shared: IosWaterRecordSnapshot)") -and
+    $sharedAdapters -cmatch [regex]::Escape("init(sharedUserInfo: UserInfo") -and
+    $sharedAdapters -cmatch [regex]::Escape("init(shared: CasLoginConfig)") -and
+    $sharedAdapters -cmatch [regex]::Escape("init(shared: IosAppReleaseSnapshot)") -and
+    $sharedAdapters -cmatch [regex]::Escape("func loginErrorMessage(_ error: LoginError)") -and
+    $sharedAdapters -cnotmatch [regex]::Escape("SharedIosDeviceSnapshot") -and
+    $sharedAdapters -cnotmatch [regex]::Escape("SharedIosWaterRecordSnapshot") -and
+    $sharedAdapters -cnotmatch [regex]::Escape("SharedUserInfo") -and
+    $sharedAdapters -cnotmatch [regex]::Escape("SharedCasLoginConfig") -and
+    $sharedAdapters -cnotmatch [regex]::Escape("SharedIosAppReleaseSnapshot") -and
+    $sharedAdapters -cnotmatch [regex]::Escape("SharedLoginError")
+Add-Check "Swift bridge references Swift-visible Shared framework symbol names" $swiftBridgeUsesSwiftVisibleSharedNames "Swift sources should use the Kotlin/Native swift_name-exported symbols instead of the Objective-C-prefixed Shared* names."
 
 $progressTracksRepoScope =
     $progress -match [regex]::Escape("shared-api") -and

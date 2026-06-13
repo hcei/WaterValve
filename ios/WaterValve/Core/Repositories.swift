@@ -105,7 +105,7 @@ final class AuthRepository {
             }
         }
 
-        if let success = result as? SharedLoginResultSuccess,
+        if let success = result as? LoginResult.Success,
            let session = currentSession() {
             return UserSession(sharedUserInfo: success.userInfo, snapshot: SharedSessionSnapshot(
                 userId: session.userId,
@@ -119,7 +119,7 @@ final class AuthRepository {
             ))
         }
 
-        if let failed = result as? SharedLoginResultFailed {
+        if let failed = result as? LoginResult.Failed {
             throw AuthRepositoryError.network(loginErrorMessage(failed.error))
         }
 
@@ -191,7 +191,7 @@ final class DeviceRepository {
         if let name, !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             try await renameDevice(id: newDevice.id, name: name)
             reloadStoredState()
-            return devices.first(where: { $0.id == newDevice.id }) ?? Device(shared: SharedIosDeviceSnapshot(id: newDevice.id, name: name, qrUrl: newDevice.qrUrl, starred: newDevice.starred, createdAt: newDevice.createdAt))
+            return devices.first(where: { $0.id == newDevice.id }) ?? Device(shared: IosDeviceSnapshot(id: newDevice.id, name: name, qrUrl: newDevice.qrUrl, starred: newDevice.starred, createdAt: newDevice.createdAt))
         }
 
         return devices.first(where: { $0.id == newDevice.id }) ?? Device(shared: newDevice)
