@@ -47,6 +47,7 @@ $sharedDeviceRepoPath = Join-Path $repoRoot "shared\src\commonMain\kotlin\com\hg
 $sharedIosKeychainPath = Join-Path $repoRoot "shared\src\iosMain\kotlin\com\hgu\watervalve\shared\platform\KeychainWrapper.kt"
 $sharedIosClockPath = Join-Path $repoRoot "shared\src\iosMain\kotlin\com\hgu\watervalve\shared\platform\PlatformClock.kt"
 $sharedIosDefaultsPath = Join-Path $repoRoot "shared\src\iosMain\kotlin\com\hgu\watervalve\shared\platform\UserDefaultsWrapper.kt"
+$sharedIosBridgePath = Join-Path $repoRoot "shared\src\iosMain\kotlin\com\hgu\watervalve\shared\platform\IosSharedBridge.kt"
 $homeViewPath = Join-Path $root "WaterValve\UI\Home\HomeView.swift"
 $valveViewPath = Join-Path $root "WaterValve\UI\Valve\ValveView.swift"
 $webViewPath = Join-Path $root "WaterValve\UI\WebView\WebViewScreen.swift"
@@ -72,6 +73,7 @@ $sharedDeviceRepo = Require-File $sharedDeviceRepoPath
 $sharedIosKeychain = Require-File $sharedIosKeychainPath
 $sharedIosClock = Require-File $sharedIosClockPath
 $sharedIosDefaults = Require-File $sharedIosDefaultsPath
+$sharedIosBridge = Require-File $sharedIosBridgePath
 $homeView = Require-File $homeViewPath
 $valveView = Require-File $valveViewPath
 $webView = Require-File $webViewPath
@@ -85,6 +87,7 @@ $requiredFiles = @(
     "WaterValve\Navigation\AppNavigation.swift",
     "WaterValve\Core\AppContainer.swift",
     "WaterValve\Core\AppState.swift",
+    "WaterValve\Core\SharedAdapters.swift",
     "WaterValve\Core\SharedBridgeProbe.swift",
     "WaterValve\UI\Login\LoginView.swift",
     "WaterValve\UI\Home\HomeView.swift",
@@ -105,6 +108,7 @@ $projectHasActiveSwiftSources =
     $project -match [regex]::Escape("WaterValveApp.swift") -and
     $project -match [regex]::Escape("BackgroundTaskManager.swift") -and
     $project -match [regex]::Escape("UpdateService.swift") -and
+    $project -match [regex]::Escape("SharedAdapters.swift") -and
     $project -match [regex]::Escape("SharedBridgeProbe.swift")
 Add-Check "Xcode project includes the active Swift app sources" $projectHasActiveSwiftSources "project.pbxproj should keep the current Swift target source set wired in."
 
@@ -262,6 +266,9 @@ $sharedIosPlatformUsesNativeSafeApis =
     $sharedIosKeychain -match [regex]::Escape("CFDictionaryCreate") -and
     $sharedIosKeychain -match [regex]::Escape("CFBridgingRetain") -and
     $sharedIosKeychain -match [regex]::Escape("CFBridgingRelease") -and
+    $sharedIosBridge -match [regex]::Escape("class IosSharedBridge") -and
+    $sharedIosBridge -match [regex]::Escape("HttpClient(Darwin)") -and
+    $sharedIosBridge -match [regex]::Escape("WaterValveDb(DatabaseDriverFactory().createDriver())") -and
     $sharedIosClock -match [regex]::Escape("time(null)") -and
     $sharedIosDefaults -match [regex]::Escape("objectForKey") -and
     $sharedIosDefaults -notmatch [regex]::Escape("stringForKey")

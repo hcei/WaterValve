@@ -1,13 +1,13 @@
 import Foundation
 import SwiftUI
+import Shared
 
 @MainActor
 final class AppContainer: ObservableObject {
-    let keychain = KeychainStore()
-    let defaults = KeyValueStore()
     let client = APIClient()
-    lazy var authRepository = AuthRepository(client: client, keychain: keychain, defaults: defaults)
-    lazy var deviceRepository = DeviceRepository(defaults: defaults, client: client, authRepository: authRepository)
+    let sharedBridge = IosSharedBridge()
+    lazy var authRepository = AuthRepository(container: self)
+    lazy var deviceRepository = DeviceRepository(container: self)
     lazy var updateRepository = UpdateRepository()
     lazy var updateService = UpdateService(client: client, updateRepository: updateRepository)
     lazy var backgroundTaskManager = BackgroundTaskManager(authRepository: authRepository)
@@ -48,45 +48,23 @@ final class AppContainer: ObservableObject {
 
     func syncStoredState(to appState: AppState) {
         deviceRepository.reloadStoredState()
-
         if let session = authRepository.currentSession() {
+            apply(session: session, to: appState)
             appState.isLoggedIn = !session.uwcToken.isEmpty
-            appState.currentUserId = session.userId
-            appState.currentNickname = session.nickname
-            appState.currentAccNum = session.accNum
-            appState.currentEpId = session.epId
-            appState.currentPerCode = session.perCode
-            appState.uwcToken = session.uwcToken
-            appState.uisToken = session.uisToken
-            appState.sessionCookie = session.sessionCookie
         } else {
+            clearSession(on: appState)
             appState.isLoggedIn = false
-            appState.currentUserId = ""
-            appState.currentNickname = ""
-            appState.currentAccNum = ""
-            appState.currentEpId = ""
-            appState.currentPerCode = ""
-            appState.uwcToken = ""
-            appState.uisToken = ""
-            appState.sessionCookie = ""
         }
-
         appState.isBanned = authRepository.isBanned()
         appState.devices = deviceRepository.devices
         appState.records = deviceRepository.records
     }
 
     func handleLoginSuccess(session: UserSession) {
-        authRepository.saveSession(session)
         deviceRepository.reloadStoredState()
-        appState?.currentUserId = session.userId
-        appState?.currentNickname = session.nickname
-        appState?.currentAccNum = session.accNum
-        appState?.currentEpId = session.epId
-        appState?.currentPerCode = session.perCode
-        appState?.uwcToken = session.uwcToken
-        appState?.uisToken = session.uisToken
-        appState?.sessionCookie = session.sessionCookie
+        if let appState {
+            apply(session: session, to: appState)
+        }
         appState?.isLoggedIn = true
         appState?.isBanned = false
         appState?.devices = deviceRepository.devices
@@ -107,14 +85,9 @@ final class AppContainer: ObservableObject {
         deviceRepository.reloadStoredState()
         appState?.isLoggedIn = false
         appState?.isBanned = false
-        appState?.currentUserId = ""
-        appState?.currentNickname = ""
-        appState?.currentAccNum = ""
-        appState?.currentEpId = ""
-        appState?.currentPerCode = ""
-        appState?.uwcToken = ""
-        appState?.uisToken = ""
-        appState?.sessionCookie = ""
+        if let appState {
+            clearSession(on: appState)
+        }
         appState?.devices = []
         appState?.records = []
         appState?.updateInfo = nil
@@ -216,17 +189,45 @@ final class AppContainer: ObservableObject {
     }
 
     func addRecord(deviceName: String) {
-        deviceRepository.addRecord(deviceName: deviceName)
-        appState?.records = deviceRepository.records
+        Task { @MainActor in
+            await deviceRepository.addRecord(deviceName: deviceName)
+            appState?.records = deviceRepository.records
+        }
     }
 
     func deleteRecord(id: UUID) {
-        deviceRepository.deleteRecord(id: id)
-        appState?.records = deviceRepository.records
+        Task { @MainActor in
+            await deviceRepository.deleteRecord(id: id)
+            appState?.records = deviceRepository.records
+        }
     }
 
     func clearRecords() {
-        deviceRepository.clearRecords()
-        appState?.records = deviceRepository.records
+        Task { @MainActor in
+            await deviceRepository.clearRecords()
+            appState?.records = deviceRepository.records
+        }
+    }
+
+    private func apply(session: UserSession, to appState: AppState) {
+        appState.currentUserId = session.userId
+        appState.currentNickname = session.nickname
+        appState.currentAccNum = session.accNum
+        appState.currentEpId = session.epId
+        appState.currentPerCode = session.perCode
+        appState.uwcToken = session.uwcToken
+        appState.uisToken = session.uisToken
+        appState.sessionCookie = session.sessionCookie
+    }
+
+    private func clearSession(on appState: AppState) {
+        appState.currentUserId = ""
+        appState.currentNickname = ""
+        appState.currentAccNum = ""
+        appState.currentEpId = ""
+        appState.currentPerCode = ""
+        appState.uwcToken = ""
+        appState.uisToken = ""
+        appState.sessionCookie = ""
     }
 }

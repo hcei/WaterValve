@@ -31,6 +31,7 @@
 		4F03D8852CFA010100000016 /* Repositories.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000017 /* Repositories.swift */; };
 		4F03D8852CFA010100000017 /* SessionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000018 /* SessionModels.swift */; };
 		4F03D8852CFA010100000018 /* SharedBridgeProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA100100000019 /* SharedBridgeProbe.swift */; };
+		4F03D8852CFA010100000019 /* SharedAdapters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F03D8852CFA10010000001A /* SharedAdapters.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -60,6 +61,7 @@
 		4F03D8852CFA100100000017 /* Repositories.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Repositories.swift; sourceTree = "<group>"; };
 		4F03D8852CFA100100000018 /* SessionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionModels.swift; sourceTree = "<group>"; };
 		4F03D8852CFA100100000019 /* SharedBridgeProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedBridgeProbe.swift; sourceTree = "<group>"; };
+		4F03D8852CFA10010000001A /* SharedAdapters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedAdapters.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -140,6 +142,7 @@
 				4F03D8852CFA100100000017 /* Repositories.swift */,
 				4F03D8852CFA100100000018 /* SessionModels.swift */,
 				4F03D8852CFA100100000019 /* SharedBridgeProbe.swift */,
+				4F03D8852CFA10010000001A /* SharedAdapters.swift */,
 			);
 		};
 		4F03D8852CFA000100000007 /* Navigation */ = {
@@ -331,6 +334,7 @@
 				4F03D8852CFA010100000016 /* Repositories.swift in Sources */,
 				4F03D8852CFA010100000017 /* SessionModels.swift in Sources */,
 				4F03D8852CFA010100000018 /* SharedBridgeProbe.swift in Sources */,
+				4F03D8852CFA010100000019 /* SharedAdapters.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
