@@ -259,8 +259,9 @@ Add-Check "Shared crypto avoids JVM-only helpers in commonMain" $sharedCryptoAvo
 
 $sharedIosPlatformUsesNativeSafeApis =
     $sharedIosKeychain -match [regex]::Escape("@OptIn(ExperimentalForeignApi::class)") -and
-    $sharedIosKeychain -match [regex]::Escape("CFTypeRefVar") -and
-    $sharedIosClock -match [regex]::Escape("gettimeofday") -and
+    $sharedIosKeychain -match [regex]::Escape("CFDictionaryCreateMutable") -and
+    $sharedIosKeychain -match [regex]::Escape("CFBridgingRetain") -and
+    $sharedIosClock -match [regex]::Escape("time(null)") -and
     $sharedIosDefaults -match [regex]::Escape("objectForKey") -and
     $sharedIosDefaults -notmatch [regex]::Escape("stringForKey")
 Add-Check "Shared iosMain platform wrappers use Kotlin/Native-safe interop" $sharedIosPlatformUsesNativeSafeApis "The iosMain keychain, clock, and defaults wrappers should use Kotlin/Native-safe Foundation/Security interop patterns."
