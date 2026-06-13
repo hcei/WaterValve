@@ -1,14 +1,14 @@
 # shared-db
 
 > Dependencies: `shared-models`
-> Current status: `implemented with SQLDelight schema and JVM compile validation`
+> Current status: `implemented with SQLDelight schema, JVM validation, and real macOS framework-build proof`
 
 ## Tasks
 
 - [x] Keep SQLDelight `Device` and `WaterRecord` schemas in `shared/commonMain`.
 - [x] Ensure SQLDelight interface generation works through `:shared:generateCommonMainWaterValveDbInterface`.
 - [x] Keep repository mappings compatible with generated query interfaces.
-- [ ] Validate the native driver path on macOS during iOS framework build.
+- [x] Validate the native driver path on macOS during iOS framework build.
 
 ## Notes
 
@@ -19,4 +19,4 @@
 
 - [x] SQLDelight schema generation succeeds.
 - [x] Shared JVM compilation succeeds with the generated database interfaces.
-- [ ] macOS validates the iOS native-driver path.
+- [x] macOS validates the iOS native-driver path.
