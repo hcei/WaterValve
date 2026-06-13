@@ -1,7 +1,7 @@
 # shared-crypto
 
 > Dependencies: `shared-models`
-> Current status: `implemented with platform crypto primitives and validated against captured UWC payload fixtures`
+> Current status: `implemented with JVM provider and pure-Kotlin iOS primitives, validated against captured UWC payload fixtures`
 
 ## Tasks
 
@@ -13,11 +13,12 @@
 ## Notes
 
 - The active Swift iOS app still keeps its own Swift crypto path under `ios/WaterValve/Core`.
-- The shared crypto implementation now delegates 3DES, MD5, and HMAC-SHA512 to platform primitives while keeping Base64, JSON wrapping, and response parsing in common code.
+- The shared crypto implementation delegates JVM execution to JCE and iOS execution to pure Kotlin 3DES/MD5/HMAC-SHA512 primitives, avoiding Xcode 26 / Kotlin/Native CommonCrypto cinterop incompatibilities.
 - `UwcCryptoParityTest` validates the shared implementation against the Android known sign value plus captured `loginByToken`, `queryCustom`, `getSysInfo`, and request `paramStr` payloads.
+- `PureCryptoPrimitivesTest` validates the pure Kotlin primitives byte-for-byte against JVM provider output for TripleDES-CBC-PKCS7, MD5, and HMAC-SHA512.
 
 ## Done Criteria
 
 - [x] Shared crypto source exists and compiles on JVM.
-- [x] Shared crypto source is compatible with simulated GitHub Actions iOS framework tasks.
+- [x] Shared crypto source is compatible with real GitHub Actions iOS framework tasks.
 - [x] Cross-platform or fixture-based proof confirms behavioral parity.

@@ -26,10 +26,10 @@
 - The repository currently contains both a concrete KMP shared layer and a Swift-native iOS target.
 - The workflow now reflects that hybrid reality: shared validation/build first, then Xcode archive.
 - The workflow disables signing for archive work, publishes both Debug and Release shared framework artifacts, runs a lightweight Swift package test suite for iOS business logic, and packages an unsigned IPA from the archived app bundle for AltStore / SideStore installs.
-- A real PR run now exists at `actions/runs/27447771358`; it failed before Gradle execution because the macOS runner hit `./gradlew: Permission denied`.
-- The workflow and `build-shared.sh` now both invoke the Gradle wrapper through `bash`, and static validation explicitly checks that safety guard.
-- A follow-up PR run at `actions/runs/27455258304` reached Gradle resolution and failed resolving `com.google.devtools.ksp` from mirror metadata; CI now skips China mirrors so official Gradle Plugin Portal / Maven repositories can resolve plugin artifacts first.
-- Windows cannot run `xcodebuild`; final proof still depends on GitHub Actions or a local macOS/Xcode machine.
+- Earlier PR runs exposed `./gradlew: Permission denied`, stale mirror metadata for `com.google.devtools.ksp`, missing SQLite linkage during archive, and Xcode 26 / Kotlin/Native CommonCrypto cinterop failures.
+- The workflow and `build-shared.sh` now both invoke the Gradle wrapper through `bash`, CI skips China mirrors so official plugin repositories resolve first, the Xcode target links `libsqlite3`, and shared iOS crypto no longer depends on CommonCrypto cinterop.
+- GitHub Actions run `27470917081` succeeded end to end on macOS, including shared JVM tests, shared iOS framework builds, Swift package logic tests, static validation, Xcode archive, unsigned IPA packaging, and artifact uploads.
+- Windows cannot run `xcodebuild`; local verification remains limited to `build_shared.bat` and static validation, while macOS proof comes from GitHub Actions.
 
 ## Done Criteria
 
