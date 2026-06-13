@@ -1,3 +1,9 @@
+@file:OptIn(
+    ExperimentalForeignApi::class,
+    BetaInteropApi::class,
+    UnsafeNumber::class,
+)
+
 package com.hgu.watervalve.shared.platform
 
 import kotlinx.cinterop.BetaInteropApi
