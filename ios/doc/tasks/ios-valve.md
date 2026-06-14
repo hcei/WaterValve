@@ -17,7 +17,7 @@
 - [x] Accept `WKScriptMessageHandler` messages under `valveBridge` so the page can report structured events without relying only on custom URL navigation.
 - [x] Record valve actions into the local record store when the page reports a valve-open event.
 - [x] Add automated Swift logic tests for valve URL building, token injection, H5 payload parsing, script-message parsing, and scan callback/event payload shaping.
-- [x] Keep the lightweight `window.wx` stub and `wxMark` injection aligned with the current Android source-of-truth, and document the spec-vs-implementation contradiction explicitly.
+- [x] Keep the lightweight `window.wx` stub and `wxMark` injection aligned with the current Android source-of-truth, and document this Android-aligned environment requirement explicitly.
 - [x] Validate that the valve module participates in successful macOS archive builds plus Swift logic tests, and document the remaining live SPA/runtime risk separately.
 
 ## Done Criteria

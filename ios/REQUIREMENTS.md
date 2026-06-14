@@ -94,7 +94,7 @@
 - WKWebView 加载 SPA 页面
 - 注入 UWC Token 使 SPA 自动完成认证
 - 用户点击开阀按钮 → SPA 内部处理
-- 注意：SPA 深度依赖微信 JS-SDK，仅加载页面不 mock 微信桥接
+- 注意：SPA 深度依赖微信 JS-SDK，不能尝试完整伪造微信环境；但需与 Android 现状保持一致，注入最小化 `window.wx` 轻量 shim 与 `wxMark` 标记以通过页面环境探测
 - URL 路径注意区分：SPA 前端 `uwc_webapp/`(无下划线) vs API `uwc_web_app/`(有下划线)
 
 #### F5 — 开阀记录
