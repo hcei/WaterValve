@@ -88,7 +88,7 @@ jobs:
           xcrun simctl install "$SIMULATOR_ID" "$APP_PATH"
           xcrun simctl launch "$SIMULATOR_ID" com.hgu.watervalve.ios
           sleep 5
-          xcrun simctl terminate "$SIMULATOR_ID" com.hgu.watervalve.ios
+          xcrun simctl terminate "$SIMULATOR_ID" com.hgu.watervalve.ios || true
 
       - name: Capture simulator log
         if: always()
