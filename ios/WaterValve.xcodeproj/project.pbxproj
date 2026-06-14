@@ -371,9 +371,12 @@
 				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
-				FRAMEWORK_SEARCH_PATHS = (
+				FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*] = (
 					"$(inherited)",
 					"$(SRCROOT)/../shared/build/bin/iosArm64/debugFramework",
+				);
+				FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*] = (
+					"$(inherited)",
 					"$(SRCROOT)/../shared/build/bin/iosSimulatorArm64/debugFramework",
 					"$(SRCROOT)/../shared/build/bin/iosX64/debugFramework",
 				);
@@ -407,9 +410,12 @@
 				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
-				FRAMEWORK_SEARCH_PATHS = (
+				FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*] = (
 					"$(inherited)",
 					"$(SRCROOT)/../shared/build/bin/iosArm64/releaseFramework",
+				);
+				FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*] = (
+					"$(inherited)",
 					"$(SRCROOT)/../shared/build/bin/iosSimulatorArm64/releaseFramework",
 					"$(SRCROOT)/../shared/build/bin/iosX64/releaseFramework",
 				);

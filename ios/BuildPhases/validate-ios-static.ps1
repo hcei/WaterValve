@@ -173,14 +173,15 @@ $buildScriptInvokesGradleViaBash =
 Add-Check "build-shared script invokes Gradle via bash" $buildScriptInvokesGradleViaBash "build-shared.sh should call the Gradle wrapper through bash so macOS CI does not depend on the executable bit."
 
 $projectConfiguresSharedFrameworkSearch =
-    $project -match [regex]::Escape("FRAMEWORK_SEARCH_PATHS") -and
+    $project -match [regex]::Escape("FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]") -and
+    $project -match [regex]::Escape("FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]") -and
     $project -match [regex]::Escape("shared/build/bin/iosArm64/debugFramework") -and
     $project -match [regex]::Escape("shared/build/bin/iosArm64/releaseFramework") -and
     $project -match [regex]::Escape("shared/build/bin/iosSimulatorArm64/debugFramework") -and
     $project -match [regex]::Escape("shared/build/bin/iosSimulatorArm64/releaseFramework") -and
     $project -match [regex]::Escape("shared/build/bin/iosX64/debugFramework") -and
     $project -match [regex]::Escape("shared/build/bin/iosX64/releaseFramework")
-Add-Check "Xcode project declares shared framework search paths" $projectConfiguresSharedFrameworkSearch "project.pbxproj should expose Shared.framework search paths for device and simulator builds."
+Add-Check "Xcode project declares conditional shared framework search paths" $projectConfiguresSharedFrameworkSearch "project.pbxproj should expose separate Shared.framework search paths for device and simulator builds."
 
 $projectLinksSqliteForSharedFramework =
     $project -match [regex]::Escape('"-lsqlite3"')
