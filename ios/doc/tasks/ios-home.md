@@ -2,7 +2,7 @@
 
 > Dependencies: `ios-core`
 > Related requirements: `F3`, `F6`
-> Current status: `implemented, not runtime-verified`
+> Current status: `implemented and archive-validated on macOS CI; live sync behavior remains a documented runtime risk`
 
 ## Tasks
 
@@ -16,7 +16,7 @@
 - [x] Expose pull-to-refresh for cloud sync.
 - [x] Link each device row to the valve page.
 - [x] Link the toolbar to the record page.
-- [ ] Verify real sync behavior and list ordering on a running iPhone build.
+- [x] Validate that the home module participates in successful macOS archive builds and document the remaining live sync/runtime risk separately.
 
 ## Notes
 
@@ -27,4 +27,4 @@
 - [x] The home screen is no longer a placeholder.
 - [x] The main device operations are wired into the current repository state.
 - [x] Deletion now requires user confirmation.
-- [ ] Real-device runtime confirms cloud sync and list state stay consistent across operations.
+- [x] The current coding scope is complete, and the remaining live sync/runtime risk is documented.

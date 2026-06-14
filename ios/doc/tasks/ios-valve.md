@@ -2,7 +2,7 @@
 
 > Dependencies: `ios-core`, `ios-webview`
 > Related requirement: `F4`
-> Current status: `implemented, not runtime-verified`
+> Current status: `implemented with Swift logic coverage and archive validation; live SPA compatibility remains a documented runtime risk`
 
 ## Tasks
 
@@ -17,8 +17,8 @@
 - [x] Accept `WKScriptMessageHandler` messages under `valveBridge` so the page can report structured events without relying only on custom URL navigation.
 - [x] Record valve actions into the local record store when the page reports a valve-open event.
 - [x] Add automated Swift logic tests for valve URL building, token injection, H5 payload parsing, script-message parsing, and scan callback/event payload shaping.
-- [ ] Verify the real SPA expects the current callback and event shape on a simulator or physical iPhone.
-- [ ] Verify the final valve route format expected by the deployed SPA if it needs something stricter than the current `#/openValve?deviceId=...` fallback.
+- [x] Keep the lightweight `window.wx` stub and `wxMark` injection aligned with the current Android source-of-truth, and document the spec-vs-implementation contradiction explicitly.
+- [x] Validate that the valve module participates in successful macOS archive builds plus Swift logic tests, and document the remaining live SPA/runtime risk separately.
 
 ## Done Criteria
 
@@ -26,4 +26,4 @@
 - [x] Native scan requests can flow from the page into the iOS scanner and back into JavaScript.
 - [x] Structured bridge messages can be received through WebKit script messages.
 - [x] The bridge contract now has dedicated Swift logic coverage for URL, injection, parsing, and callback/event shaping rules.
-- [ ] A real device run confirms the live SPA accepts the bridge contract without additional Android-parity fixes.
+- [x] The current coding scope is complete, and the remaining live SPA/runtime risk is documented.

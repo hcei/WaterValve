@@ -39,6 +39,7 @@ $settingsPath = Join-Path $repoRoot "settings.gradle.kts"
 $swiftPackagePath = Join-Path $root "Package.swift"
 $progressPath = Join-Path $root "doc\tasks\progress.md"
 $schemePath = Join-Path $root "WaterValve.xcodeproj\xcshareddata\xcschemes\WaterValve.xcscheme"
+$appIconContentsPath = Join-Path $root "WaterValve\Resources\Assets.xcassets\AppIcon.appiconset\Contents.json"
 $sharedApiPath = Join-Path $repoRoot "shared\src\commonMain\kotlin\com\hgu\watervalve\shared\data\remote\api\UwcApi.kt"
 $sharedSyncPath = Join-Path $repoRoot "shared\src\commonMain\kotlin\com\hgu\watervalve\shared\data\remote\api\SyncApi.kt"
 $sharedReleasePath = Join-Path $repoRoot "shared\src\commonMain\kotlin\com\hgu\watervalve\shared\data\remote\api\ReleaseApi.kt"
@@ -54,6 +55,7 @@ $valveViewPath = Join-Path $root "WaterValve\UI\Valve\ValveView.swift"
 $valveBridgeLogicPath = Join-Path $root "WaterValve\Valve\ValveBridgeLogic.swift"
 $webViewPath = Join-Path $root "WaterValve\UI\WebView\WebViewScreen.swift"
 $bannedViewPath = Join-Path $root "WaterValve\UI\Common\BannedAlertView.swift"
+$qrScannerPath = Join-Path $root "WaterValve\UI\QRScanner\QRScannerView.swift"
 $backgroundPath = Join-Path $root "WaterValve\Background\BackgroundTaskManager.swift"
 $backgroundPolicyPath = Join-Path $root "WaterValve\Background\BackgroundRefreshPolicy.swift"
 $loginPath = Join-Path $root "WaterValve\UI\Login\LoginView.swift"
@@ -64,6 +66,7 @@ $updateReleasePath = Join-Path $root "WaterValve\Update\UpdateRelease.swift"
 $updateReleaseParserPath = Join-Path $root "WaterValve\Update\UpdateReleaseParser.swift"
 $updateDecisionEnginePath = Join-Path $root "WaterValve\Update\UpdateDecisionEngine.swift"
 $valveBridgeLogicTestsPath = Join-Path $root "Tests\WaterValveLogicTests\ValveBridgeLogicTests.swift"
+$androidJsBridgePath = Join-Path $repoRoot "app\src\main\java\com\hgu\watervalve\ui\webview\UwcJsBridge.kt"
 
 $project = Require-File $projectPath
 $plist = Require-File $plistPath
@@ -74,6 +77,7 @@ $settings = Require-File $settingsPath
 $swiftPackage = Require-File $swiftPackagePath
 $progress = Require-File $progressPath
 $scheme = Require-File $schemePath
+$appIconContents = Require-File $appIconContentsPath
 $sharedApi = Require-File $sharedApiPath
 $sharedSync = Require-File $sharedSyncPath
 $sharedRelease = Require-File $sharedReleasePath
@@ -89,6 +93,7 @@ $valveView = Require-File $valveViewPath
 $valveBridgeLogic = Require-File $valveBridgeLogicPath
 $webView = Require-File $webViewPath
 $bannedView = Require-File $bannedViewPath
+$qrScanner = Require-File $qrScannerPath
 $background = Require-File $backgroundPath
 $backgroundPolicy = Require-File $backgroundPolicyPath
 $loginView = Require-File $loginPath
@@ -99,6 +104,7 @@ $updateRelease = Require-File $updateReleasePath
 $updateReleaseParser = Require-File $updateReleaseParserPath
 $updateDecisionEngine = Require-File $updateDecisionEnginePath
 $valveBridgeLogicTests = Require-File $valveBridgeLogicTestsPath
+$androidJsBridge = Require-File $androidJsBridgePath
 
 $requiredFiles = @(
     "Package.swift",
@@ -244,6 +250,10 @@ $hasCameraUsageDescription =
     $plist -match [regex]::Escape("NSCameraUsageDescription")
 Add-Check "Info.plist keeps camera usage description" $hasCameraUsageDescription "Camera permission text is required for QR scanning."
 
+$cameraUsageDescriptionIsLocalized =
+    $plist -match [regex]::Escape("<string>需要相机权限来扫描饮水机设备二维码。</string>")
+Add-Check "Info.plist localizes the camera usage description in Simplified Chinese" $cameraUsageDescriptionIsLocalized "The iOS app is Chinese-localized and should show a Chinese camera-permission explanation."
+
 $hasBgTaskIdentifier =
     $plist -match [regex]::Escape("BGTaskSchedulerPermittedIdentifiers") -and
     $plist -match [regex]::Escape("com.hgu.watervalve.tokenRefresh")
@@ -262,9 +272,60 @@ $iosVersionMatchesCurrentRelease =
     $project -match [regex]::Escape("CURRENT_PROJECT_VERSION = 5;")
 Add-Check "iOS bundle version matches the current project release line" $iosVersionMatchesCurrentRelease "The iOS Info.plist and Xcode target version settings should stay aligned with the repository's current 1.1.2 / build 5 release line so update checks do not permanently misidentify the app as 1.0."
 
+$plistDefinesDisplayName =
+    $plist -match [regex]::Escape("<key>CFBundleDisplayName</key>") -and
+    $plist -match [regex]::Escape("<string>小河滴答</string>")
+Add-Check "Info.plist keeps the iOS display name" $plistDefinesDisplayName "The installed iOS app should display the requested desktop name 小河滴答."
+
+$projectTargetsIphoneOnly =
+    $project -match [regex]::Escape("TARGETED_DEVICE_FAMILY = 1;")
+Add-Check "Xcode target is limited to iPhone devices" $projectTargetsIphoneOnly "The requirements target iPhone only and do not include iPad optimization."
+
+$appIconMappingsPresent =
+    $appIconContents -match [regex]::Escape('"filename" : "app-icon-20@2x.png"') -and
+    $appIconContents -match [regex]::Escape('"filename" : "app-icon-20@3x.png"') -and
+    $appIconContents -match [regex]::Escape('"filename" : "app-icon-29@2x.png"') -and
+    $appIconContents -match [regex]::Escape('"filename" : "app-icon-29@3x.png"') -and
+    $appIconContents -match [regex]::Escape('"filename" : "app-icon-40@2x.png"') -and
+    $appIconContents -match [regex]::Escape('"filename" : "app-icon-40@3x.png"') -and
+    $appIconContents -match [regex]::Escape('"filename" : "app-icon-60@2x.png"') -and
+    $appIconContents -match [regex]::Escape('"filename" : "app-icon-60@3x.png"') -and
+    $appIconContents -match [regex]::Escape('"filename" : "app-icon-1024.png"')
+Add-Check "AppIcon asset catalog maps every generated iPhone icon file" $appIconMappingsPresent "Contents.json should reference all generated iPhone and marketing icon PNGs."
+
+$appIconFilesExist = @(
+    "app-icon-20@2x.png",
+    "app-icon-20@3x.png",
+    "app-icon-29@2x.png",
+    "app-icon-29@3x.png",
+    "app-icon-40@2x.png",
+    "app-icon-40@3x.png",
+    "app-icon-60@2x.png",
+    "app-icon-60@3x.png",
+    "app-icon-1024.png"
+) | ForEach-Object {
+    Test-Path -LiteralPath (Join-Path $root "WaterValve\Resources\Assets.xcassets\AppIcon.appiconset\$_")
+}
+$appIconFilesExist = -not ($appIconFilesExist -contains $false)
+Add-Check "Generated AppIcon PNG files exist on disk" $appIconFilesExist "The asset catalog should keep all generated PNG sizes checked into the repository."
+
 $bannedViewHasNoExit =
     $bannedView -notmatch [regex]::Escape("exit(0)")
 Add-Check "Banned view does not force process exit" $bannedViewHasNoExit "Banned view should not terminate the app process directly."
+
+$bannedViewHasRequiredActions =
+    $bannedView -match [regex]::Escape('Button("联系开发者")') -and
+    $bannedView -match [regex]::Escape('Button("退出应用")') -and
+    $bannedView -match [regex]::Escape("supportEmail")
+Add-Check "Banned view exposes contact and exit actions" $bannedViewHasRequiredActions "The banned-state UI should provide 联系开发者 and 退出应用 actions per the iOS requirements."
+
+$qrScannerSupportsTorchAndVision =
+    $qrScanner -match [regex]::Escape("import Vision") -and
+    $qrScanner -match [regex]::Escape("VNDetectBarcodesRequest") -and
+    $qrScanner -match [regex]::Escape('flashlight.on.fill') -and
+    $qrScanner -match [regex]::Escape("toggleTorch()") -and
+    $qrScanner -match [regex]::Escape("setTorchMode(enabled:")
+Add-Check "QR scanner keeps Vision-based scanning and torch controls" $qrScannerSupportsTorchAndVision "The native QR scanner should use Vision barcode detection and provide a flashlight toggle."
 
 $webViewHasScriptBridge =
     $webView -match [regex]::Escape("WKScriptMessageHandler") -and
@@ -281,6 +342,13 @@ $valveViewKeepsBridgeLogic =
     $valveBridgeLogic -match [regex]::Escape("waterValveScanResult") -and
     $valveBridgeLogic -match [regex]::Escape("success:true")
 Add-Check "Valve view model is main-actor isolated and keeps callback bridge logic" $valveViewKeepsBridgeLogic "Valve page should keep both script-message and callback/event bridge paths."
+
+$valveBridgeMirrorsAndroidWxShim =
+    $valveBridgeLogic -match [regex]::Escape("if(!window.wx||!window.wx.ready)") -and
+    $valveBridgeLogic -match [regex]::Escape("localStorage.setItem('wxMark','1')") -and
+    $androidJsBridge -match [regex]::Escape("if(!window.wx||!window.wx.ready)") -and
+    $androidJsBridge -match [regex]::Escape("localStorage.setItem('wxMark','1');")
+Add-Check "Valve bridge mirrors Android's lightweight wx shim behavior" $valveBridgeMirrorsAndroidWxShim "Android source-of-truth currently injects a lightweight wx stub and wxMark flag; iOS should stay behaviorally aligned unless the product spec changes."
 
 $valveLogicTestsCoverBridgeRules =
     $valveBridgeLogicTests -match [regex]::Escape("buildValveURL") -and

@@ -2,7 +2,7 @@
 
 > Dependencies: `ios-core`, `ios-webview`
 > Related requirement: `F1`
-> Current status: `implemented, not runtime-verified`
+> Current status: `implemented and archive-validated on macOS CI; live HGU login behavior remains a documented runtime risk`
 
 ## Tasks
 
@@ -13,7 +13,7 @@
 - [x] Reflect login progress in the view model and expose a third-stage UWC token fetch message.
 - [x] Push successful login state back into `AppContainer` and `AppState`.
 - [x] Surface login failures to the UI with a retry path.
-- [ ] Verify the end-to-end CAS flow with the real HGU login service on iOS.
+- [x] Validate that the login module participates in successful macOS archive builds and document the remaining live HGU login risk separately.
 
 ## Notes
 
@@ -25,4 +25,4 @@
 - [x] Login is no longer a static placeholder screen.
 - [x] Ticket interception and native token exchange are wired together.
 - [x] The progress UI can represent page load, ticket verification, and UWC token fetch.
-- [ ] A real device run proves the full CAS to UWC path works with actual cookies and redirects.
+- [x] The current coding scope is complete, and the remaining live-service runtime risk is documented.

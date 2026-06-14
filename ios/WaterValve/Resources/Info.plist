@@ -12,6 +12,8 @@
     <string>6.0</string>
     <key>CFBundleName</key>
     <string>$(PRODUCT_NAME)</string>
+    <key>CFBundleDisplayName</key>
+    <string>小河滴答</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
@@ -21,7 +23,7 @@
     <key>LSRequiresIPhoneOS</key>
     <true/>
     <key>NSCameraUsageDescription</key>
-    <string>Camera access is required to scan device QR codes.</string>
+    <string>需要相机权限来扫描饮水机设备二维码。</string>
     <key>BGTaskSchedulerPermittedIdentifiers</key>
     <array>
         <string>com.hgu.watervalve.tokenRefresh</string>
