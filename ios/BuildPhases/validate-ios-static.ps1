@@ -215,6 +215,17 @@ $workflowRunsSwiftPackageTests =
     $workflow -match [regex]::Escape("swift test --package-path ios")
 Add-Check "Workflow runs Swift package logic tests" $workflowRunsSwiftPackageTests "GitHub Actions should run the lightweight Swift package tests that cover the iOS update and background scheduling rules."
 
+$workflowRunsSimulatorSmokeTest =
+    $workflow -match [regex]::Escape("Build simulator app") -and
+    $workflow -match [regex]::Escape('xcodebuild build \') -and
+    $workflow -match [regex]::Escape('xcrun simctl list devices available') -and
+    $workflow -match [regex]::Escape('Boot simulator') -and
+    $workflow -match [regex]::Escape('Install and launch simulator app') -and
+    $workflow -match [regex]::Escape('xcrun simctl install "$SIMULATOR_ID" "$APP_PATH"') -and
+    $workflow -match [regex]::Escape('xcrun simctl launch "$SIMULATOR_ID" com.hgu.watervalve.ios') -and
+    $workflow -match [regex]::Escape('xcrun simctl terminate "$SIMULATOR_ID" com.hgu.watervalve.ios')
+Add-Check "Workflow builds and smoke-tests the app on an iOS simulator" $workflowRunsSimulatorSmokeTest "GitHub Actions should build the simulator app, boot an available iPhone simulator, install the app, launch it, and confirm it stays alive long enough to terminate cleanly."
+
 $workflowPackagesUnsignedIpa =
     $workflow -match [regex]::Escape("Package unsigned IPA") -and
     $workflow -match [regex]::Escape("WaterValve-unsigned.ipa") -and
