@@ -223,6 +223,9 @@ $workflowRunsSimulatorSmokeTest =
     $workflow -match [regex]::Escape("Build simulator app") -and
     $workflow -match [regex]::Escape('xcodebuild build \') -and
     $workflow -match [regex]::Escape('xcrun simctl list devices available') -and
+    $workflow -match [regex]::Escape('ONLY_ACTIVE_ARCH=YES') -and
+    $workflow -match [regex]::Escape('ARCHS=arm64') -and
+    $workflow -match [regex]::Escape("shared/build/bin/iosSimulatorArm64/debugFramework") -and
     $workflow -match [regex]::Escape('Boot simulator') -and
     $workflow -match [regex]::Escape('Install and launch simulator app') -and
     $workflow -match [regex]::Escape('xcrun simctl install "$SIMULATOR_ID" "$APP_PATH"') -and
