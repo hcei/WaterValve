@@ -1,5 +1,6 @@
 # Gradle
 .gradle/
+.gradle-ci-sim/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 
@@ -35,3 +36,14 @@ build_now.bat
 
 # Environment
 .env
+
+# Reasonix agent context (local only, junction to global skills)
+.reasonix/
+shared/build/
+ios/.config/
+ios/.reasonix/
+ios/logs/
+ios/build/
+*.xcuserstate
+xcuserdata/
+DerivedData/
