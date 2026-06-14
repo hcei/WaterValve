@@ -143,6 +143,8 @@ jobs:
             shared/build/bin/iosArm64/releaseFramework/Shared.framework
             shared/build/bin/iosSimulatorArm64/debugFramework/Shared.framework
             shared/build/bin/iosSimulatorArm64/releaseFramework/Shared.framework
+            shared/build/bin/iosX64/debugFramework/Shared.framework
+            shared/build/bin/iosX64/releaseFramework/Shared.framework
           if-no-files-found: warn
           retention-days: 30
 

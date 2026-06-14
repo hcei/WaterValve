@@ -11,13 +11,14 @@ kotlin {
     // iOS targets — 仅在 macOS 上编译，Windows 上自动跳过
     iosArm64()
     iosSimulatorArm64()
+    iosX64()
 
     // 启用 expect/actual classes（Kotlin 2.1.x 仍处于 Beta）
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
 
-    listOf(iosArm64(), iosSimulatorArm64()).forEach { target ->
+    listOf(iosArm64(), iosSimulatorArm64(), iosX64()).forEach { target ->
         target.binaries.framework {
             baseName = "Shared"
             isStatic = true
@@ -52,6 +53,11 @@ kotlin {
         }
 
         iosSimulatorArm64Main.dependencies {
+            implementation(libs.ktor.client.darwin)
+            implementation(libs.sqldelight.native.driver)
+        }
+
+        iosX64Main.dependencies {
             implementation(libs.ktor.client.darwin)
             implementation(libs.sqldelight.native.driver)
         }

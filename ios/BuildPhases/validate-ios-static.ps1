@@ -163,6 +163,8 @@ Add-Check "Shared Xcode scheme points at the WaterValve native target" $schemeTa
 $buildScriptBuildsShared =
     $buildScript -match [regex]::Escape(":shared:linkDebugFrameworkIosArm64") -and
     $buildScript -match [regex]::Escape(":shared:linkReleaseFrameworkIosArm64") -and
+    $buildScript -match [regex]::Escape(":shared:linkDebugFrameworkIosX64") -and
+    $buildScript -match [regex]::Escape(":shared:linkReleaseFrameworkIosX64") -and
     $buildScript -match [regex]::Escape("FRAMEWORK_TASK_SUFFIX")
 Add-Check "build-shared script selects shared framework tasks per Xcode configuration" $buildScriptBuildsShared "build-shared.sh should support both Debug and Release shared framework tasks."
 
@@ -175,7 +177,9 @@ $projectConfiguresSharedFrameworkSearch =
     $project -match [regex]::Escape("shared/build/bin/iosArm64/debugFramework") -and
     $project -match [regex]::Escape("shared/build/bin/iosArm64/releaseFramework") -and
     $project -match [regex]::Escape("shared/build/bin/iosSimulatorArm64/debugFramework") -and
-    $project -match [regex]::Escape("shared/build/bin/iosSimulatorArm64/releaseFramework")
+    $project -match [regex]::Escape("shared/build/bin/iosSimulatorArm64/releaseFramework") -and
+    $project -match [regex]::Escape("shared/build/bin/iosX64/debugFramework") -and
+    $project -match [regex]::Escape("shared/build/bin/iosX64/releaseFramework")
 Add-Check "Xcode project declares shared framework search paths" $projectConfiguresSharedFrameworkSearch "project.pbxproj should expose Shared.framework search paths for device and simulator builds."
 
 $projectLinksSqliteForSharedFramework =
@@ -408,6 +412,12 @@ $sharedIosPlatformUsesNativeSafeApis =
     $sharedIosDefaults -match [regex]::Escape("objectForKey") -and
     $sharedIosDefaults -notmatch [regex]::Escape("stringForKey")
 Add-Check "Shared iosMain platform wrappers use Kotlin/Native-safe interop" $sharedIosPlatformUsesNativeSafeApis "The iosMain keychain, clock, and defaults wrappers should use Kotlin/Native-safe Foundation/Security interop patterns."
+
+$sharedBuildSupportsIntelSimulator =
+    $workflow -match [regex]::Escape("shared/build/bin/iosX64/debugFramework/Shared.framework") -and
+    $workflow -match [regex]::Escape("shared/build/bin/iosX64/releaseFramework/Shared.framework") -and
+    $sharedBuildBat -match [regex]::Escape(":shared:compileTestKotlinJvm")
+Add-Check "CI artifacts include the x86_64 simulator shared framework variant" $sharedBuildSupportsIntelSimulator "GitHub Actions should retain the iosX64 Shared.framework artifact so simulator builds that still request x86_64 can link successfully."
 
 $total = $checks.Count
 $passed = ($checks | Where-Object { $_.Passed }).Count

@@ -21,17 +21,23 @@ if [[ -z "${SDK_NAME:-}" ]]; then
     TARGET_TASKS=(
       ":shared:link${FRAMEWORK_TASK_SUFFIX}FrameworkIosArm64"
       ":shared:link${FRAMEWORK_TASK_SUFFIX}FrameworkIosSimulatorArm64"
+      ":shared:link${FRAMEWORK_TASK_SUFFIX}FrameworkIosX64"
     )
   else
     TARGET_TASKS=(
       ":shared:linkDebugFrameworkIosArm64"
       ":shared:linkDebugFrameworkIosSimulatorArm64"
+      ":shared:linkDebugFrameworkIosX64"
       ":shared:linkReleaseFrameworkIosArm64"
       ":shared:linkReleaseFrameworkIosSimulatorArm64"
+      ":shared:linkReleaseFrameworkIosX64"
     )
   fi
 elif [[ "${SDK_NAME}" == *simulator* ]]; then
-  TARGET_TASKS=(":shared:link${FRAMEWORK_TASK_SUFFIX}FrameworkIosSimulatorArm64")
+  TARGET_TASKS=(
+    ":shared:link${FRAMEWORK_TASK_SUFFIX}FrameworkIosSimulatorArm64"
+    ":shared:link${FRAMEWORK_TASK_SUFFIX}FrameworkIosX64"
+  )
 else
   TARGET_TASKS=(":shared:link${FRAMEWORK_TASK_SUFFIX}FrameworkIosArm64")
 fi
