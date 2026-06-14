@@ -71,7 +71,7 @@
 		4F03D8852CFA100100000021 /* UpdateRelease.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateRelease.swift; sourceTree = "<group>"; };
 		4F03D8852CFA100100000022 /* UpdateReleaseParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateReleaseParser.swift; sourceTree = "<group>"; };
 		4F03D8852CFA100100000023 /* UpdateDecisionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateDecisionEngine.swift; sourceTree = "<group>"; };
-		4F03D8852CFA100100000024 /* ValveBridgeLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValveBridgeLogic.swift; sourceTree = "<group>"; };
+		4F03D8852CFA100100000024 /* ValveBridgeLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../../Valve/ValveBridgeLogic.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */

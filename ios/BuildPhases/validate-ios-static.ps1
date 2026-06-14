@@ -141,6 +141,10 @@ $projectHasActiveSwiftSources =
     $project -match [regex]::Escape("SharedBridgeProbe.swift")
 Add-Check "Xcode project includes the active Swift app sources" $projectHasActiveSwiftSources "project.pbxproj should keep the current Swift target source set wired in."
 
+$projectResolvesValveBridgeLogicFromStandaloneFolder =
+    $project -match [regex]::Escape('4F03D8852CFA100100000024 /* ValveBridgeLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../../Valve/ValveBridgeLogic.swift; sourceTree = "<group>"; };')
+Add-Check "Xcode project resolves ValveBridgeLogic.swift from WaterValve/Valve" $projectResolvesValveBridgeLogicFromStandaloneFolder "project.pbxproj should reference ValveBridgeLogic.swift from the standalone WaterValve/Valve folder so archive builds do not look under UI/Valve."
+
 $sharedProbeImportsModule =
     $sharedProbe -match [regex]::Escape("import Shared")
 Add-Check "Swift target contains a concrete Shared framework import probe" $sharedProbeImportsModule "At least one Swift source should import Shared so the target verifies module availability during real Xcode builds."
